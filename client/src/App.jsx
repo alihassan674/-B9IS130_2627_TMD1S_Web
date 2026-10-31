@@ -42,8 +42,8 @@ function App() {
 
   const milestones = [
     { day: 'Day 1', title: 'MERN & Tailwind v4 Scaffolding', status: 'Completed', icon: Server, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
-    { day: 'Day 2', title: 'JWT Authentication & Security', status: 'Next', icon: ShieldCheck, color: 'text-indigo-600 bg-indigo-50 border-indigo-200' },
-    { day: 'Day 3', title: 'Client Auth Context & Navigation', status: 'Planned', icon: Compass, color: 'text-slate-600 bg-slate-50 border-slate-200' },
+    { day: 'Day 2', title: 'JWT Authentication & Security', status: 'Completed', icon: ShieldCheck, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
+    { day: 'Day 3', title: 'Client Auth Context & Navigation', status: 'Next', icon: Compass, color: 'text-indigo-600 bg-indigo-50 border-indigo-200' },
     { day: 'Day 4', title: 'Trip Model & CRUD Dashboard', status: 'Planned', icon: Calendar, color: 'text-slate-600 bg-slate-50 border-slate-200' },
     { day: 'Day 5', title: 'Places & Location Logging', status: 'Planned', icon: MapPin, color: 'text-slate-600 bg-slate-50 border-slate-200' },
     { day: 'Day 6', title: 'Cloudinary Photo Uploads', status: 'Planned', icon: Sparkles, color: 'text-slate-600 bg-slate-50 border-slate-200' },
@@ -71,7 +71,7 @@ function App() {
           <div className="flex items-center gap-4">
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Day 1 Milestone Active
+              Day 2 Milestone Active
             </span>
           </div>
         </div>
