@@ -68,3 +68,29 @@ TravelLog proposes a web-based trip journaling system that enables users to crea
 | **FR-14** | The system shall prevent visitors from viewing trips that are private or not shared. | `Must` |
 | **FR-15** | The system shall allow a trip owner to search or filter their trips by title or destination. | `Should` |
 | **FR-16** | The system shall allow a trip owner to choose which trip details are displayed on the shared page. | `Should` |
+
+---
+
+## 4. Non-Functional Requirements
+
+> **Non-Functional Requirements (NFRs)** describe how well the system should work—covering security, privacy, performance, usability, reliability, and maintainability.
+
+### Requirements Table
+
+| ID | Quality Attribute | Requirement Specification |
+| :--- | :--- | :--- |
+| **NFR-01** | Security | Users must only create, read, update, or delete trips and entries they own, except for explicitly shared read-only pages. |
+| **NFR-02** | Privacy | Trips shall be private by default. Sharing must be enabled by the owner. |
+| **NFR-03** | Performance | Under the project’s test conditions, the main trip list and trip detail pages should load within 3 seconds for 95% of requests. |
+| **NFR-04** | Usability | The main trip creation and journal-entry workflows shall be usable without instructions or documentation. |
+| **NFR-05** | Responsive Design | The application shall support usable layouts at mobile, tablet, and desktop viewport sizes. |
+| **NFR-06** | Accessibility | Forms, navigation, and interactive controls shall support keyboard operation and use appropriate labels and contrast. |
+| **NFR-07** | Reliability | The system shall provide clear error messages when a request fails and shall not silently discard unsaved user input. |
+| **NFR-08** | Maintainability | The application shall use separated frontend, backend, and data-access responsibilities, with documented setup instructions. |
+| **NFR-09** | Data Validation | The backend shall validate incoming data, including trip dates, expense amounts, and required fields. |
+| **NFR-10** | Deployment & Security | The deployed application shall use environment variables for configuration and shall not expose secrets in client-side code or the Git repository. |
+
+> [!NOTE]
+> **Performance Target Note:** The 3-second load time target is a proposed project benchmark for testing, rather than an already measured metric. Actual response times will be tested, evaluated, and reported during project verification.
+
+
