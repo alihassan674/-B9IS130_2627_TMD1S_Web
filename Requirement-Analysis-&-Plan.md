@@ -93,4 +93,21 @@ TravelLog proposes a web-based trip journaling system that enables users to crea
 > [!NOTE]
 > **Performance Target Note:** The 3-second load time target is a proposed project benchmark for testing, rather than an already measured metric. Actual response times will be tested, evaluated, and reported during project verification.
 
+---
+
+## 5. Project Scope
+
+### First Version (MVP / In-Scope)
+- User registration and authentication
+- Create, view, update, and delete trips
+- Trip details (title, destination, and dates)
+- Dated journal entries with places and notes
+- Photograph uploads
+- Chronological trip timeline
+- Expense recording and trip spending totals
+- Private trips and owner-controlled sharing
+- Public read-only shared trip pages
+- Responsive interface across mobile, tablet, and desktop
+- Backend validation and authorization
+- Deployment and testing
 
