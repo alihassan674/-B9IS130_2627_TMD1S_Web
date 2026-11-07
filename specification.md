@@ -335,7 +335,180 @@ Client  ←  200  { trips: [...] }
 
 ---
 
-## 🔲 Task 4 — *(Upcoming)*
+## ✅ Task 4 — JWT Route Protection & Authorization Middleware *(Completed)*
+
+### What Was Done
+
+Implemented route protection and authorization using **JSON Web Tokens (JWT)** and custom Express middleware (`protect`). While Task 3 established the User schema and authentication routes (`/register`, `/login`), Task 4 establishes the **authorization layer**:
+- Configured Bearer token validation for incoming HTTP requests.
+- Created `backend/src/middleware/authMiddleware.js` to intercept and authenticate requests before they reach protected controller logic.
+- Implemented and verified the protected route `GET /api/auth/me` to confirm identity extraction and user authentication.
+- Added comprehensive error handling for missing, malformed, or expired tokens.
+
+---
+
+### How Bearer Token Authentication Works
+
+1. **Client Sign-In:** The user signs in via `POST /api/auth/login` (or registers) and receives a signed JWT.
+2. **Authorization Header:** For every subsequent protected request, the client includes the token in the HTTP `Authorization` header:
+   ```http
+   Authorization: Bearer <jwt_token_string>
+   ```
+3. **Middleware Interception:** The `protect` middleware extracts the token after the `Bearer ` prefix.
+4. **Signature Verification:** The middleware verifies the token signature against `process.env.JWT_SECRET`.
+5. **Database Consistency Check:** The decoded user ID is looked up in MongoDB to verify the account still exists.
+6. **Request Augmentation:** A sanitized user object (`id`, `name`, `email`) is attached to `req.user`.
+7. **Execution Handoff:** Control is passed to the next route handler via `next()`.
+
+---
+
+### Project Structure (Updated)
+
+```
+TravelLog/
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── db.js                  # MongoDB Atlas connection
+│   │   ├── middleware/
+│   │   │   └── authMiddleware.js      # JWT Bearer token protection middleware (NEW)
+│   │   ├── models/
+│   │   │   └── User.js                # Mongoose user model & schema
+│   │   └── routes/
+│   │       ├── authRoutes.js          # /register, /login, and protected /me
+│   │       └── index.js               # /health check
+│   ├── .env                           # JWT_SECRET & JWT_EXPIRES_IN configured
+│   ├── .env.example
+│   ├── package.json                   # bcryptjs, jsonwebtoken, express, mongoose
+│   └── server.js                      # Express application entry point
+├── frontend/                          # React + Vite application
+├── README.md
+├── specification.md                   # Task specifications & progress log
+└── Requirement-Analysis-&-Plan.md
+```
+
+---
+
+### Code Implementation Details
+
+#### 1. Middleware: `backend/src/middleware/authMiddleware.js`
+
+```javascript
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+const protect = async (req, res, next) => {
+  try {
+    let token;
+
+    // Check for Authorization header starting with "Bearer "
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer ')
+    ) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+
+    // 1. Missing Token Check
+    if (!token) {
+      return res.status(401).json({
+        message: 'Not authorized. Please log in.',
+      });
+    }
+
+    // 2. Token Verification
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // 3. Ensure User Exists in Database
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(401).json({
+        message: 'User no longer exists',
+      });
+    }
+
+    // 4. Attach Clean User Data to Request
+    req.user = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+    };
+
+    next();
+  } catch (error) {
+    // 5. Expired or Tampered Token Handling
+    if (
+      error.name === 'JsonWebTokenError' ||
+      error.name === 'TokenExpiredError'
+    ) {
+      return res.status(401).json({
+        message: 'Invalid or expired token',
+      });
+    }
+
+    next(error);
+  }
+};
+
+module.exports = protect;
+```
+
+#### 2. Protected Route: `GET /api/auth/me` (`backend/src/routes/authRoutes.js`)
+
+```javascript
+// GET /api/auth/me — Protected route: requires valid Bearer token
+router.get('/me', protect, async (req, res) => {
+  res.status(200).json({
+    user: req.user,
+  });
+});
+```
+
+---
+
+### Security Measures Implemented
+
+| Security Attribute | Implementation Detail |
+| :--- | :--- |
+| **Stateless Authentication** | Tokens are digitally signed with HMAC SHA-256 (`jwt.sign`) using `JWT_SECRET`; no session state stored in server memory. |
+| **Tamper Resistance** | Any client-side alteration of token payload or headers invalidates the cryptographic signature, triggering `JsonWebTokenError`. |
+| **Token Expiry Limit** | Tokens expire according to `JWT_EXPIRES_IN` (e.g. `1d`), reducing risk if a token is inadvertently compromised. |
+| **Account Invalidation Check** | Even with a valid token, deleted accounts cannot access data; `User.findById(decoded.id)` guarantees active persistence. |
+| **Least-Privilege Payload** | `req.user` contains only public identity fields (`id`, `name`, `email`), keeping sensitive hashes inaccessible to downstream handlers. |
+| **Standardized HTTP 401s** | Unauthenticated and unauthorized requests receive standard HTTP `401 Unauthorized` with unambiguous JSON feedback. |
+
+---
+
+### Verification & Testing Scenarios
+
+| Test Case | Request Header | Expected Response Status | Expected JSON Body |
+| :--- | :--- | :---: | :--- |
+| **No Token Provided** | None | `401 Unauthorized` | `{"message": "Not authorized. Please log in."}` |
+| **Malformed / Invalid Token** | `Authorization: Bearer invalid123` | `401 Unauthorized` | `{"message": "Invalid or expired token"}` |
+| **Expired Token** | `Authorization: Bearer <expired_token>` | `401 Unauthorized` | `{"message": "Invalid or expired token"}` |
+| **Valid Bearer Token** | `Authorization: Bearer <valid_token>` | `200 OK` | `{"user": {"id": "...", "name": "...", "email": "..."}}` |
+
+---
+
+### Updated API Endpoints
+
+| Method | Endpoint | Description | Access Level |
+| :----- | :------- | :---------- | :----------- |
+| `GET` | `/api/health` | Server & DB health check | ❌ Public |
+| `POST` | `/api/auth/register` | Register new account & generate token | ❌ Public |
+| `POST` | `/api/auth/login` | Authenticate credentials & return token | ❌ Public |
+| `GET` | `/api/auth/me` | Fetch authenticated user profile | 🔒 Protected (Bearer Token) |
+
+---
+
+### Deliverables Achieved
+
+> ✅ `protect` middleware implemented and exported from `authMiddleware.js`  
+> ✅ Bearer token format parsed and validated in HTTP headers  
+> ✅ Specific error handlers for `JsonWebTokenError` and `TokenExpiredError`  
+> ✅ `GET /api/auth/me` route operational and protected  
+> ✅ Verified route security preventing unauthenticated access  
+> ✅ Clean integration pattern established for guarding future trip/journal/expense endpoints
 
 ---
 
