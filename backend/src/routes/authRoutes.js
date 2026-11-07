@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const protect = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
@@ -126,6 +127,14 @@ router.post('/login', async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+
+// GET /api/auth/me
+router.get('/me', protect, async (req, res) => {
+  res.status(200).json({
+    user: req.user,
+  });
 });
 
 module.exports = router;
