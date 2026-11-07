@@ -148,7 +148,190 @@ Sets dev port to `3000`. Configures a proxy so that any request to `/api` is for
 
 ---
 
-## 🔲 Task 3 — *(Upcoming)*
+
+
+## ✅ Task 3 — Authentication & Authorization *(Completed)*
+
+### What Was Done
+
+Implemented secure user registration and login using **JWT (JSON Web Tokens)** and **bcryptjs** password hashing. Added a `protect` middleware that guards any route requiring a signed-in user. The backend now enforces that only authenticated users can access protected resources.
+
+---
+
+### New Libraries Installed
+
+| Library | Version | Type | Purpose |
+| :--- | :--- | :--- | :--- |
+| **bcryptjs** | ^3.0.3 | dependency | Hashes passwords before storing — plaintext passwords are never saved to the database |
+| **jsonwebtoken** | ^9.0.3 | dependency | Signs and verifies JWTs — used to authenticate users on protected routes |
+
+---
+
+### Updated Project Structure
+
+```
+backend/
+├── src/
+│   ├── config/
+│   │   └── db.js                  ← existing (unchanged)
+│   ├── models/
+│   │   └── User.js                ← NEW — MongoDB user schema
+│   ├── routes/
+│   │   ├── index.js               ← existing (unchanged)
+│   │   └── authRoutes.js          ← NEW — register, login endpoints
+│   └── middleware/
+│       └── authMiddleware.js      ← NEW — protect() JWT guard
+├── server.js                      ← updated — mounts authRoutes
+├── .env                           ← updated — added JWT_SECRET, JWT_EXPIRES_IN
+└── package.json                   ← updated — bcryptjs, jsonwebtoken added
+```
+
+---
+
+### New Files Created
+
+#### `backend/src/models/User.js` — User Schema
+Defines the MongoDB document structure for a user account.
+
+| Field | Type | Rules |
+| :--- | :--- | :--- |
+| `name` | String | Required, trimmed |
+| `email` | String | Required, unique, lowercased, trimmed |
+| `password` | String | Required, min 8 chars, `select: false` (never returned in queries) |
+| `createdAt` | Date | Auto-added by `timestamps: true` |
+| `updatedAt` | Date | Auto-added by `timestamps: true` |
+
+> `select: false` on the password field means it is never accidentally returned in any query unless explicitly requested with `.select('+password')`.
+
+---
+
+#### `backend/src/routes/authRoutes.js` — Auth Endpoints
+
+**`POST /api/auth/register`**
+1. Validates that `name`, `email`, and `password` are present.
+2. Checks password is at least 8 characters.
+3. Normalizes email (trim + lowercase).
+4. Checks if an account with that email already exists → returns `409` if so.
+5. Hashes the password with `bcrypt.hash(password, 12)` (12 salt rounds).
+6. Creates the user in MongoDB with `User.create()`.
+7. Generates a JWT with `jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn })`.
+8. Returns `201` with `{ message, token, user: { id, name, email } }`.
+
+**`POST /api/auth/login`**
+1. Validates `email` and `password` are present.
+2. Looks up the user by normalized email, explicitly including the password with `.select('+password')`.
+3. Returns `401` with a generic message if user not found (avoids revealing whether the email exists).
+4. Compares entered password against stored hash using `bcrypt.compare()`.
+5. Returns `401` if password doesn't match (same generic message — prevents email enumeration).
+6. Generates a JWT and returns `200` with `{ message, token, user: { id, name, email } }`.
+
+---
+
+#### `backend/src/middleware/authMiddleware.js` — `protect` Guard
+
+Middleware function placed in front of any route that requires authentication.
+
+**How it works:**
+1. Reads the `Authorization` header — expects format: `Bearer <token>`.
+2. If no token is present → returns `401`.
+3. Calls `jwt.verify(token, JWT_SECRET)` to decode and validate the token.
+4. Looks up the user by the `id` stored in the token payload (excluding password).
+5. If user not found → returns `401`.
+6. Attaches the user to `req.user` and calls `next()` so the route handler runs.
+7. If the token is expired or invalid → returns `401`.
+
+---
+
+### Updated API Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+| :----- | :------- | :---------- | :------------ |
+| `GET` | `/api/health` | Server health check | ❌ Public |
+| `POST` | `/api/auth/register` | Create a new user account | ❌ Public |
+| `POST` | `/api/auth/login` | Sign in, returns JWT | ❌ Public |
+
+---
+
+### Updated Environment Variables (`.env`)
+
+| Variable | Purpose | Example Value |
+| :--- | :--- | :--- |
+| `PORT` | Express server port | `5000` |
+| `MONGO_URI` | MongoDB Atlas connection string | `mongodb+srv://...` |
+| `NODE_ENV` | Runtime environment | `development` |
+| `JWT_SECRET` | Secret key used to sign/verify JWTs | `imsecretjwttoken` |
+| `JWT_EXPIRES_IN` | Token expiry duration | `1d` |
+
+> **Security note:** `JWT_SECRET` should be a long random string in production. Never commit the actual `.env` file to Git.
+
+---
+
+### How Authentication Flows
+
+```
+── Registration ─────────────────────────────────────────────────
+
+Client  →  POST /api/auth/register  { name, email, password }
+                    │
+              authRoutes.js
+                    │
+              Validate fields
+                    │
+              bcrypt.hash(password, 12)      ← plaintext never stored
+                    │
+              User.create({ name, email, hashedPassword })
+                    │
+              jwt.sign({ id }, JWT_SECRET)
+                    │
+Client  ←  201  { token, user: { id, name, email } }
+
+── Login ────────────────────────────────────────────────────────
+
+Client  →  POST /api/auth/login  { email, password }
+                    │
+              authRoutes.js
+                    │
+              User.findOne({ email }).select('+password')
+                    │
+              bcrypt.compare(entered, stored hash)
+                    │
+              jwt.sign({ id }, JWT_SECRET)
+                    │
+Client  ←  200  { token, user: { id, name, email } }
+
+── Protected Route (future) ─────────────────────────────────────
+
+Client  →  GET /api/trips   Authorization: Bearer <token>
+                    │
+              authMiddleware.protect()
+                    │
+              jwt.verify(token, JWT_SECRET)   → decoded.id
+                    │
+              User.findById(id)  → req.user
+                    │
+              route handler runs with req.user available
+                    │
+Client  ←  200  { trips: [...] }
+```
+
+---
+
+### Deliverable Achieved
+
+> ✅ `POST /api/auth/register` — creates user with hashed password in MongoDB  
+> ✅ `POST /api/auth/login` — verifies credentials and returns JWT  
+> ✅ `protect` middleware ready to guard any private route  
+> ✅ Password never stored or returned in plaintext  
+> ✅ Generic error messages prevent email/password enumeration  
+> ✅ `JWT_SECRET` and `JWT_EXPIRES_IN` loaded from `.env`
+
+---
+
+### Reference
+
+- [ChatGPT conversation reference](https://chatgpt.com/s/t_6aeec323b6ac819193f836610961d529)
+- [jsonwebtoken npm docs](https://www.npmjs.com/package/jsonwebtoken)
+- [bcryptjs npm docs](https://www.npmjs.com/package/bcryptjs)
 
 ---
 
