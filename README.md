@@ -23,31 +23,37 @@ A full-stack **MERN** web application where users can create trips, write dated 
 
 ```
 TravelLog/
-├── frontend/                    # React (Vite) app — port 3000
-│   ├── src/
-│   │   ├── App.jsx              # Status page — checks backend connection
-│   │   ├── App.css              # Minimal styles
-│   │   ├── main.jsx             # React entry point
-│   │   └── index.css            # Global CSS reset
-│   ├── public/
-│   ├── vite.config.js           # Vite + /api proxy config
-│   ├── .env.example
-│   └── package.json
-│
 ├── backend/                     # Express REST API — port 5000
 │   ├── src/
 │   │   ├── config/
 │   │   │   └── db.js            # MongoDB Atlas connection (Mongoose)
+│   │   ├── middleware/
+│   │   │   └── authMiddleware.js # JWT Bearer route protection guard
+│   │   ├── models/
+│   │   │   └── User.js          # User schema & validation rules
 │   │   └── routes/
+│   │       ├── authRoutes.js    # /register, /login, and /me endpoints
 │   │       └── index.js         # GET /api/health
-│   ├── server.js                # Entry point, middleware, error handlers
-│   ├── .env.example
-│   └── package.json
+│   ├── .env.example             # Environment variable template
+│   ├── package.json             # Express, Mongoose, bcryptjs, JWT, cors, dotenv
+│   └── server.js                # Entry point: Express, middleware, routes
 │
-├── README.md
-├── .gitignore
-├── specification.md             # Task log and implementation notes
-└── Requirement-Analysis-&-Plan.md
+├── frontend/                    # React (Vite) app — port 3000
+│   ├── public/
+│   │   └── favicon.svg          # TravelLog airplane icon
+│   ├── src/
+│   │   ├── App.css              # Clean component styles
+│   │   ├── App.jsx              # Status page — checks backend connection
+│   │   ├── index.css            # 12-line clean CSS reset
+│   │   └── main.jsx             # React entry point
+│   ├── index.html               # Page title & root mount point
+│   ├── package.json             # Minimal dependencies (React 19 + Vite)
+│   └── vite.config.js           # Vite + /api proxy config
+│
+├── .gitignore                   # Ignores node_modules, .env, dist, logs
+├── README.md                    # Setup guide and documentation
+├── Requirement-Analysis-&-Plan.md # Academic requirements & plan
+└── specification.md             # Detailed task log & implementation notes
 ```
 
 ---
@@ -203,6 +209,8 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | :------ | :------ | :------ |
 | `express` | ^5.3.0 | HTTP server framework — creates the server, defines routes, registers middleware |
 | `mongoose` | ^9.12.0 | MongoDB ODM — connects to Atlas, defines Schemas and Models for CRUD |
+| `bcryptjs` | ^3.0.3 | Password hashing algorithm (12 rounds) — keeps plaintext passwords out of DB |
+| `jsonwebtoken` | ^9.0.3 | Signs and verifies stateless JWT Bearer tokens for route authorization |
 | `dotenv` | ^18.0.9 | Loads `KEY=VALUE` pairs from `.env` into `process.env` at startup |
 | `cors` | ^2.8.6 | Adds HTTP headers allowing the React frontend (port 3000) to call the API (port 5000) |
 | `nodemon` *(dev)* | ^3.1.14 | Watches files and auto-restarts the server on save — development only |
@@ -223,10 +231,12 @@ You should see ✅ for both **React running** and **Backend API connected**.
 ### `backend/.env`
 
 | Variable | Description | Example |
-| :------- | :---------- | :------ |`
+| :------- | :---------- | :------ |
 | `PORT` | Port the Express server listens on | `5000` |
 | `MONGO_URI` | Full MongoDB Atlas connection string | `mongodb+srv://user:pass@cluster...` |
 | `NODE_ENV` | Runtime environment | `development` |
+| `JWT_SECRET` | Secret key used to sign and verify JWT tokens | `your_secret_key` |
+| `JWT_EXPIRES_IN` | Token validity duration | `1d` |
 
 ### `frontend/.env`
 
