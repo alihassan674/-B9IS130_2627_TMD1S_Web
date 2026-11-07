@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./src/config/db');
 const routes = require('./src/routes/index');
+const authRoutes = require('./src/routes/authRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -13,6 +14,7 @@ app.use(express.json());
 
 // ── Routes ───────────────────────────────────────────────────
 app.use('/api', routes);
+app.use('/api/auth', authRoutes);
 
 // ── 404 handler ──────────────────────────────────────────────
 app.use((req, res) => {
