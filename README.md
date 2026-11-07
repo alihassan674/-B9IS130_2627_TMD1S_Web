@@ -241,6 +241,9 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Method | Endpoint | Description | Auth Required |
 | :----- | :------- | :---------- | :------------ |
 | `GET` | `/api/health` | Server and DB health check | ❌ Public |
+| `POST` | `/api/auth/register` | Register new user account | ❌ Public |
+| `POST` | `/api/auth/login` | Authenticate and obtain JWT token | ❌ Public |
+| `GET` | `/api/auth/me` | Retrieve authenticated user profile | 🔒 Protected (Bearer Token) |
 
 > More endpoints will be added per task. See [`Requirement-Analysis-&-Plan.md`](./Requirement-Analysis-&-Plan.md) → Appendix B for the full planned API.
 
@@ -252,9 +255,10 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | :--- | :---------- | :----: |
 | Task 1 | Repository setup + Requirements Analysis & Plan | ✅ Done |
 | Task 2 | Basic project setup (React + Express + MongoDB Atlas) | ✅ Done |
-| Task 3 | Data models + Authentication + Trip CRUD | 🔲 Upcoming |
-| Task 4 | Journal entries, timeline, photos, expenses, sharing | 🔲 Upcoming |
-| Task 5 | Testing, deployment, report, presentation | 🔲 Upcoming |
+| Task 3 | User registration, login & password hashing (bcryptjs) | ✅ Done |
+| Task 4 | JWT route protection & authorization middleware | ✅ Done |
+| Task 5 | Trip CRUD, Journal entries, Timeline, Photos, Expenses | 🔲 Upcoming |
+| Task 6 | Testing, deployment, final report & presentation | 🔲 Upcoming |
 
 ---
 
