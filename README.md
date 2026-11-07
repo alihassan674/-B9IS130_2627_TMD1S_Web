@@ -223,7 +223,7 @@ You should see ✅ for both **React running** and **Backend API connected**.
 ### `backend/.env`
 
 | Variable | Description | Example |
-| :------- | :---------- | :------ |
+| :------- | :---------- | :------ |`
 | `PORT` | Port the Express server listens on | `5000` |
 | `MONGO_URI` | Full MongoDB Atlas connection string | `mongodb+srv://user:pass@cluster...` |
 | `NODE_ENV` | Runtime environment | `development` |
