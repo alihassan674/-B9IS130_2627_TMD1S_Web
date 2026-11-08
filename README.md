@@ -266,8 +266,9 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 2 | Basic project setup (React + Express + MongoDB Atlas) | ✅ Done |
 | Task 3 | User registration, login & password hashing (bcryptjs) | ✅ Done |
 | Task 4 | JWT route protection & authorization middleware | ✅ Done |
-| Task 5 | Trip CRUD, Journal entries, Timeline, Photos, Expenses | 🔲 Upcoming |
-| Task 6 | Testing, deployment, final report & presentation | 🔲 Upcoming |
+| Task 5 | Frontend authentication, token storage & protected dashboard | ✅ Done |
+| Task 6 | Trip CRUD, Journal entries, Timeline, Photos, Expenses | 🔲 Upcoming |
+| Task 7 | Testing, deployment, final report & presentation | 🔲 Upcoming |
 
 ---
 
