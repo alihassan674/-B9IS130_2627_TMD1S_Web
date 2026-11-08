@@ -42,9 +42,8 @@ TravelLog/
 │   ├── public/
 │   │   └── favicon.svg          # TravelLog airplane icon
 │   ├── src/
-│   │   ├── App.css              # Clean component styles
+│   │   ├── App.css              # Single CSS file (base styles + components)
 │   │   ├── App.jsx              # Status page — checks backend connection
-│   │   ├── index.css            # 12-line clean CSS reset
 │   │   └── main.jsx             # React entry point
 │   ├── index.html               # Page title & root mount point
 │   ├── package.json             # Minimal dependencies (React 19 + Vite)
