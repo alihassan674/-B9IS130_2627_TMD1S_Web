@@ -46,8 +46,9 @@ TravelLog/
 │   │   ├── pages/
 │   │   │   ├── CreateTrip.jsx   # Trip creation form component
 │   │   │   ├── Dashboard.jsx    # Protected dashboard view
+│   │   │   ├── EditTrip.jsx     # Trip editing form component
 │   │   │   ├── Login.jsx        # Login form component
-│   │   │   ├── MyTrips.jsx      # Trips list & CreateTrip wrapper
+│   │   │   ├── MyTrips.jsx      # Trips list, edit & delete controls
 │   │   │   └── Register.jsx     # Registration form component
 │   │   ├── App.css              # Consolidated stylesheet
 │   │   ├── App.jsx              # Main app auth router & session management
@@ -283,8 +284,9 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 6 | Trip CRUD API (Trip model, validation, owner isolation) | ✅ Done |
 | Task 7 | Trips list UI component & Dashboard integration (`MyTrips.jsx`) | ✅ Done |
 | Task 8 | Trip creation form & real-time list integration (`CreateTrip.jsx`) | ✅ Done |
-| Task 9 | Journal entries, Timeline, Photos, Expenses, Sharing | 🔲 Upcoming |
-| Task 10 | Testing, deployment, final report & presentation | 🔲 Upcoming |
+| Task 9 | Trip Edit and Delete functionality (`EditTrip.jsx` & `MyTrips.jsx`) | ✅ Done |
+| Task 10 | Journal entries, Timeline, Photos, Expenses, Sharing | 🔲 Upcoming |
+| Task 11 | Testing, deployment, final report & presentation | 🔲 Upcoming |
 
 ---
 
