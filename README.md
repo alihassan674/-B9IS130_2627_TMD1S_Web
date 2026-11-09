@@ -30,11 +30,12 @@ TravelLog/
 │   │   ├── middleware/
 │   │   │   └── authMiddleware.js # JWT Bearer route protection guard
 │   │   ├── models/
+│   │   │   ├── Trip.js          # Trip schema & date validations
 │   │   │   └── User.js          # User schema & validation rules
 │   │   └── routes/
 │   │       ├── authRoutes.js    # /register, /login, and /me endpoints
-│   │       └── index.js         # GET /api/health
-│   ├── .env.example             # Environment variable template
+│   │       ├── index.js         # GET /api/health
+│   │       └── tripRoutes.js    # Trip CRUD endpoints
 │   ├── package.json             # Express, Mongoose, bcryptjs, JWT, cors, dotenv
 │   └── server.js                # Entry point: Express, middleware, routes
 │
@@ -42,8 +43,12 @@ TravelLog/
 │   ├── public/
 │   │   └── favicon.svg          # TravelLog airplane icon
 │   ├── src/
-│   │   ├── App.css              # Single CSS file (base styles + components)
-│   │   ├── App.jsx              # Status page — checks backend connection
+│   │   ├── pages/
+│   │   │   ├── Dashboard.jsx    # Protected dashboard view & logout
+│   │   │   ├── Login.jsx        # Login form component
+│   │   │   └── Register.jsx     # Registration form component
+│   │   ├── App.css              # Consolidated stylesheet
+│   │   ├── App.jsx              # Main app auth router & session management
 │   │   └── main.jsx             # React entry point
 │   ├── index.html               # Page title & root mount point
 │   ├── package.json             # Minimal dependencies (React 19 + Vite)
@@ -52,7 +57,8 @@ TravelLog/
 ├── .gitignore                   # Ignores node_modules, .env, dist, logs
 ├── README.md                    # Setup guide and documentation
 ├── Requirement-Analysis-&-Plan.md # Academic requirements & plan
-└── specification.md             # Detailed task log & implementation notes
+├── specification.md             # Detailed task log & implementation notes
+└── testinglist.md               # Testing checklist & verification log
 ```
 
 ---
@@ -253,6 +259,11 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | `POST` | `/api/auth/register` | Register new user account | ❌ Public |
 | `POST` | `/api/auth/login` | Authenticate and obtain JWT token | ❌ Public |
 | `GET` | `/api/auth/me` | Retrieve authenticated user profile | 🔒 Protected (Bearer Token) |
+| `POST` | `/api/trips` | Create a new trip | 🔒 Protected (Bearer Token) |
+| `GET` | `/api/trips` | List all trips for authenticated user | 🔒 Protected (Bearer Token) |
+| `GET` | `/api/trips/:id` | Get details of a single owned trip | 🔒 Protected (Bearer Token) |
+| `PUT` | `/api/trips/:id` | Update destination, dates, or details | 🔒 Protected (Bearer Token) |
+| `DELETE` | `/api/trips/:id` | Delete an owned trip | 🔒 Protected (Bearer Token) |
 
 > More endpoints will be added per task. See [`Requirement-Analysis-&-Plan.md`](./Requirement-Analysis-&-Plan.md) → Appendix B for the full planned API.
 
@@ -267,8 +278,9 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 3 | User registration, login & password hashing (bcryptjs) | ✅ Done |
 | Task 4 | JWT route protection & authorization middleware | ✅ Done |
 | Task 5 | Frontend authentication, token storage & protected dashboard | ✅ Done |
-| Task 6 | Trip CRUD, Journal entries, Timeline, Photos, Expenses | 🔲 Upcoming |
-| Task 7 | Testing, deployment, final report & presentation | 🔲 Upcoming |
+| Task 6 | Trip CRUD API (Trip model, validation, owner isolation) | ✅ Done |
+| Task 7 | Connect Trips to Frontend UI, Journal entries, Timeline | 🔲 Upcoming |
+| Task 8 | Testing, deployment, final report & presentation | 🔲 Upcoming |
 
 ---
 
