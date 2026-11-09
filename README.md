@@ -46,6 +46,7 @@ TravelLog/
 │   │   └── favicon.svg          # TravelLog airplane icon
 │   ├── src/
 │   │   ├── pages/
+│   │   │   ├── CreateJournalEntry.jsx # Journal entry creation form component (Task 12)
 │   │   │   ├── CreateTrip.jsx   # Trip creation form component
 │   │   │   ├── Dashboard.jsx    # Protected dashboard view
 │   │   │   ├── EditTrip.jsx     # Trip editing form component (Task 9)
@@ -295,7 +296,7 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 9 | Trip Edit and Delete functionality (`EditTrip.jsx` & `MyTrips.jsx`) | ✅ Done |
 | Task 10 | Journal entries backend model & routes (`JournalEntry.js`, `journalRoutes.js`) | ✅ Done |
 | Task 11 | Journal entries frontend listing & toggle UI (`JournalEntries.jsx`) | ✅ Done |
-| Task 12 | Journal creation form & chronological timeline display | 🔲 Upcoming |
+| Task 12 | Journal creation form & chronological timeline display (`CreateJournalEntry.jsx`) | ✅ Done |
 | Task 13 | Photos, expenses, sharing & public page | 🔲 Upcoming |
 | Task 14 | Final testing, deployment, report & presentation | 🔲 Upcoming |
 
