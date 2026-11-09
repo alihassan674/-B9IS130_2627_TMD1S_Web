@@ -1,5 +1,5 @@
-
 import { useEffect, useState } from 'react'
+import CreateTrip from './CreateTrip'
 
 function MyTrips() {
     const [trips, setTrips] = useState([])
@@ -34,6 +34,13 @@ function MyTrips() {
         fetchTrips()
     }, [])
 
+    const handleTripCreated = (newTrip) => {
+        setTrips((previousTrips) => [
+            newTrip,
+            ...previousTrips,
+        ])
+    }
+
     if (loading) {
         return <p>Loading trips...</p>
     }
@@ -44,6 +51,10 @@ function MyTrips() {
 
     return (
         <section>
+            <CreateTrip onTripCreated={handleTripCreated} />
+
+            <hr />
+
             <h3>My Trips</h3>
 
             {trips.length === 0 ? (

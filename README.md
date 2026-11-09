@@ -44,8 +44,10 @@ TravelLog/
 │   │   └── favicon.svg          # TravelLog airplane icon
 │   ├── src/
 │   │   ├── pages/
-│   │   │   ├── Dashboard.jsx    # Protected dashboard view & logout
+│   │   │   ├── CreateTrip.jsx   # Trip creation form component
+│   │   │   ├── Dashboard.jsx    # Protected dashboard view
 │   │   │   ├── Login.jsx        # Login form component
+│   │   │   ├── MyTrips.jsx      # Trips list & CreateTrip wrapper
 │   │   │   └── Register.jsx     # Registration form component
 │   │   ├── App.css              # Consolidated stylesheet
 │   │   ├── App.jsx              # Main app auth router & session management
@@ -279,8 +281,10 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 4 | JWT route protection & authorization middleware | ✅ Done |
 | Task 5 | Frontend authentication, token storage & protected dashboard | ✅ Done |
 | Task 6 | Trip CRUD API (Trip model, validation, owner isolation) | ✅ Done |
-| Task 7 | Connect Trips to Frontend UI, Journal entries, Timeline | 🔲 Upcoming |
-| Task 8 | Testing, deployment, final report & presentation | 🔲 Upcoming |
+| Task 7 | Trips list UI component & Dashboard integration (`MyTrips.jsx`) | ✅ Done |
+| Task 8 | Trip creation form & real-time list integration (`CreateTrip.jsx`) | ✅ Done |
+| Task 9 | Journal entries, Timeline, Photos, Expenses, Sharing | 🔲 Upcoming |
+| Task 10 | Testing, deployment, final report & presentation | 🔲 Upcoming |
 
 ---
 
