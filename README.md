@@ -30,11 +30,13 @@ TravelLog/
 │   │   ├── middleware/
 │   │   │   └── authMiddleware.js # JWT Bearer route protection guard
 │   │   ├── models/
+│   │   │   ├── JournalEntry.js  # Journal schema & date indexing
 │   │   │   ├── Trip.js          # Trip schema & date validations
 │   │   │   └── User.js          # User schema & validation rules
 │   │   └── routes/
 │   │       ├── authRoutes.js    # /register, /login, and /me endpoints
 │   │       ├── index.js         # GET /api/health
+│   │       ├── journalRoutes.js # Nested journal entry CRUD routes
 │   │       └── tripRoutes.js    # Trip CRUD endpoints
 │   ├── package.json             # Express, Mongoose, bcryptjs, JWT, cors, dotenv
 │   └── server.js                # Entry point: Express, middleware, routes
@@ -46,7 +48,7 @@ TravelLog/
 │   │   ├── pages/
 │   │   │   ├── CreateTrip.jsx   # Trip creation form component
 │   │   │   ├── Dashboard.jsx    # Protected dashboard view
-│   │   │   ├── EditTrip.jsx     # Trip editing form component
+│   │   │   ├── EditTrip.jsx     # Trip editing form component (Task 9)
 │   │   │   ├── Login.jsx        # Login form component
 │   │   │   ├── MyTrips.jsx      # Trips list, edit & delete controls
 │   │   │   └── Register.jsx     # Registration form component
@@ -265,8 +267,13 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | `POST` | `/api/trips` | Create a new trip | 🔒 Protected (Bearer Token) |
 | `GET` | `/api/trips` | List all trips for authenticated user | 🔒 Protected (Bearer Token) |
 | `GET` | `/api/trips/:id` | Get details of a single owned trip | 🔒 Protected (Bearer Token) |
-| `PUT` | `/api/trips/:id` | Update destination, dates, or details | 🔒 Protected (Bearer Token) |
-| `DELETE` | `/api/trips/:id` | Delete an owned trip | 🔒 Protected (Bearer Token) |
+| `PUT` | `/api/trips/:id` | Update destination, dates, or details (Task 9) | 🔒 Protected (Bearer Token) |
+| `DELETE` | `/api/trips/:id` | Delete an owned trip (Task 9) | 🔒 Protected (Bearer Token) |
+| `POST` | `/api/trips/:tripId/journals` | Add a journal entry to a trip (Task 10) | 🔒 Protected (Bearer Token) |
+| `GET` | `/api/trips/:tripId/journals` | View journal entries for a trip (Task 10) | 🔒 Protected (Bearer Token) |
+| `GET` | `/api/trips/:tripId/journals/:entryId` | View single journal entry (Task 10) | 🔒 Protected (Bearer Token) |
+| `PUT` | `/api/trips/:tripId/journals/:entryId` | Update journal entry (Task 10) | 🔒 Protected (Bearer Token) |
+| `DELETE` | `/api/trips/:tripId/journals/:entryId` | Delete journal entry (Task 10) | 🔒 Protected (Bearer Token) |
 
 > More endpoints will be added per task. See [`Requirement-Analysis-&-Plan.md`](./Requirement-Analysis-&-Plan.md) → Appendix B for the full planned API.
 
@@ -285,8 +292,10 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 7 | Trips list UI component & Dashboard integration (`MyTrips.jsx`) | ✅ Done |
 | Task 8 | Trip creation form & real-time list integration (`CreateTrip.jsx`) | ✅ Done |
 | Task 9 | Trip Edit and Delete functionality (`EditTrip.jsx` & `MyTrips.jsx`) | ✅ Done |
-| Task 10 | Journal entries, Timeline, Photos, Expenses, Sharing | 🔲 Upcoming |
-| Task 11 | Testing, deployment, final report & presentation | 🔲 Upcoming |
+| Task 10 | Journal entries backend model & routes (`JournalEntry.js`, `journalRoutes.js`) | 🟡 In Progress |
+| Task 11 | Journal entries UI & chronological timeline display | 🔲 Upcoming |
+| Task 12 | Photos, expenses, sharing & public page | 🔲 Upcoming |
+| Task 13 | Final testing, deployment, report & presentation | 🔲 Upcoming |
 
 ---
 
