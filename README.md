@@ -49,6 +49,7 @@ TravelLog/
 │   │   │   ├── CreateTrip.jsx   # Trip creation form component
 │   │   │   ├── Dashboard.jsx    # Protected dashboard view
 │   │   │   ├── EditTrip.jsx     # Trip editing form component (Task 9)
+│   │   │   ├── JournalEntries.jsx # Journal list & viewer component (Task 11)
 │   │   │   ├── Login.jsx        # Login form component
 │   │   │   ├── MyTrips.jsx      # Trips list, edit & delete controls
 │   │   │   └── Register.jsx     # Registration form component
@@ -292,10 +293,11 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 7 | Trips list UI component & Dashboard integration (`MyTrips.jsx`) | ✅ Done |
 | Task 8 | Trip creation form & real-time list integration (`CreateTrip.jsx`) | ✅ Done |
 | Task 9 | Trip Edit and Delete functionality (`EditTrip.jsx` & `MyTrips.jsx`) | ✅ Done |
-| Task 10 | Journal entries backend model & routes (`JournalEntry.js`, `journalRoutes.js`) | 🟡 In Progress |
-| Task 11 | Journal entries UI & chronological timeline display | 🔲 Upcoming |
-| Task 12 | Photos, expenses, sharing & public page | 🔲 Upcoming |
-| Task 13 | Final testing, deployment, report & presentation | 🔲 Upcoming |
+| Task 10 | Journal entries backend model & routes (`JournalEntry.js`, `journalRoutes.js`) | ✅ Done |
+| Task 11 | Journal entries frontend listing & toggle UI (`JournalEntries.jsx`) | ✅ Done |
+| Task 12 | Journal creation form & chronological timeline display | 🔲 Upcoming |
+| Task 13 | Photos, expenses, sharing & public page | 🔲 Upcoming |
+| Task 14 | Final testing, deployment, report & presentation | 🔲 Upcoming |
 
 ---
 

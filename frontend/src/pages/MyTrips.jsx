@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import CreateTrip from './CreateTrip'
 import EditTrip from './EditTrip'
+import JournalEntries from './JournalEntries'
 
 function MyTrips() {
     const [trips, setTrips] = useState([])
@@ -9,6 +10,7 @@ function MyTrips() {
     const [error, setError] = useState('')
     const [editingTrip, setEditingTrip] = useState(null)
     const [deletingId, setDeletingId] = useState(null)
+    const [selectedJournalTripId, setSelectedJournalTripId] = useState(null)
 
     useEffect(() => {
         const fetchTrips = async () => {
@@ -51,6 +53,10 @@ function MyTrips() {
                 trip._id === updatedTrip._id ? updatedTrip : trip
             )
         )
+
+        if (selectedJournalTripId === tripId) {
+            setSelectedJournalTripId(null)
+        }
 
         setEditingTrip(null)
     }
@@ -170,6 +176,25 @@ function MyTrips() {
                                     ? 'Deleting...'
                                     : 'Delete'}
                             </button>
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setSelectedJournalTripId(
+                                        selectedJournalTripId === trip._id
+                                            ? null
+                                            : trip._id
+                                    )
+                                }
+                            >
+                                {selectedJournalTripId === trip._id
+                                    ? 'Hide Journal'
+                                    : 'View Journal'}
+                            </button>
+
+                            {selectedJournalTripId === trip._id && (
+                                <JournalEntries tripId={trip._id} />
+                            )}
                         </div>
                     ))}
                 </div>
