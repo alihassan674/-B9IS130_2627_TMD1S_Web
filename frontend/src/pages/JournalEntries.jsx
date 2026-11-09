@@ -1,5 +1,5 @@
-
 import { useEffect, useState } from 'react'
+import CreateJournalEntry from './CreateJournalEntry'
 
 function JournalEntries({ tripId }) {
     const [entries, setEntries] = useState([])
@@ -54,6 +54,15 @@ function JournalEntries({ tripId }) {
         }
     }, [tripId])
 
+    const handleEntryCreated = (newEntry) => {
+        setEntries((previousEntries) =>
+            [...previousEntries, newEntry].sort(
+                (a, b) =>
+                    new Date(a.entryDate) - new Date(b.entryDate)
+            )
+        )
+    }
+
     if (loading) {
         return <p>Loading journal entries...</p>
     }
@@ -64,6 +73,13 @@ function JournalEntries({ tripId }) {
 
     return (
         <section>
+            <CreateJournalEntry
+                tripId={tripId}
+                onEntryCreated={handleEntryCreated}
+            />
+
+            <hr />
+
             <h4>Journal Entries</h4>
 
             {entries.length === 0 ? (
