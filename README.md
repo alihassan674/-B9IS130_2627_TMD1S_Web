@@ -56,7 +56,7 @@ TravelLog/
 │   │   │   ├── JournalEntries.jsx # Journal list, controls & embedded PhotoGallery
 │   │   │   ├── Login.jsx        # Login form component
 │   │   │   ├── MyTrips.jsx      # Trips list, edit & delete controls
-│   │   │   ├── PhotoGallery.jsx # Travel photo gallery & add form (Task 15)
+│   │   │   ├── PhotoGallery.jsx # Travel photo gallery, add, edit & delete (Tasks 15 & 16)
 │   │   │   └── Register.jsx     # Registration form component
 │   │   ├── App.css              # Consolidated stylesheet
 │   │   ├── App.jsx              # Main app auth router & session management
@@ -66,8 +66,10 @@ TravelLog/
 │   └── vite.config.js           # Vite + /api proxy config
 │
 ├── .gitignore                   # Ignores node_modules, .env, dist, logs
+├── Presentaion&DemoUniversity.md # University presentation slides & live demo script
 ├── README.md                    # Setup guide and documentation
 ├── Requirement-Analysis-&-Plan.md # Academic requirements & plan
+├── Technical-Report-University-Project.md # Formal university technical report
 ├── specification.md             # Detailed task log & implementation notes
 └── testinglist.md               # Testing checklist & verification log
 ```
@@ -309,12 +311,15 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 13 | Journal entry Edit and Delete functionality (`EditJournalEntry.jsx` & `JournalEntries.jsx`) | ✅ Done |
 | Task 14 | Travel Photos backend model & CRUD endpoints (`Photo.js`, `photoRoutes.js`) | ✅ Done |
 | Task 15 | Travel Photos frontend gallery & add form (`PhotoGallery.jsx`) | ✅ Done |
-| Task 16 | Photo edit/delete controls, expenses & sharing | 🔲 Upcoming |
-| Task 17 | Final testing, deployment, report & presentation | 🔲 Upcoming |
+| Task 16 | Travel Photos Edit and Delete functionality (`PhotoGallery.jsx`) | ✅ Done |
+| Task 17 | Expenses tracking & trip sharing | 🔲 Upcoming |
+| Task 18 | Final testing, deployment & submission | 🔲 Upcoming |
 
 ---
 
 ## See Also
 
 - [`specification.md`](./specification.md) — detailed task log with implementation notes
-- [`Requirement-Analysis-&-Plan.md`](./Requirement-Analysis-&-Plan.md) — full requirements analysis
+- [`Requirement-Analysis-&-Plan.md`](./Requirement-Analysis-&-Plan.md) — full academic requirements analysis
+- [`Technical-Report-University-Project.md`](./Technical-Report-University-Project.md) — formal technical report for university submission
+- [`Presentaion&DemoUniversity.md`](./Presentaion&DemoUniversity.md) — presentation outline & live demo guide
