@@ -9,6 +9,12 @@ function PhotoGallery({ entryId }) {
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState('')
 
+    const [editingId, setEditingId] = useState(null)
+    const [editUrl, setEditUrl] = useState('')
+    const [editCaption, setEditCaption] = useState('')
+    const [updating, setUpdating] = useState(false)
+    const [deletingId, setDeletingId] = useState(null)
+
     useEffect(() => {
         let active = true
 
@@ -41,13 +47,9 @@ function PhotoGallery({ entryId }) {
                     setPhotos(data.photos)
                 }
             } catch (err) {
-                if (active) {
-                    setError(err.message)
-                }
+                if (active) setError(err.message)
             } finally {
-                if (active) {
-                    setLoading(false)
-                }
+                if (active) setLoading(false)
             }
         }
 
@@ -74,10 +76,7 @@ function PhotoGallery({ entryId }) {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`,
                     },
-                    body: JSON.stringify({
-                        imageUrl,
-                        caption,
-                    }),
+                    body: JSON.stringify({ imageUrl, caption }),
                 }
             )
 
@@ -89,17 +88,118 @@ function PhotoGallery({ entryId }) {
                 )
             }
 
-            setPhotos((previousPhotos) => [
-                ...previousPhotos,
-                data.photo,
-            ])
-
+            setPhotos((previous) => [...previous, data.photo])
             setImageUrl('')
             setCaption('')
         } catch (err) {
             setError(err.message)
         } finally {
             setSaving(false)
+        }
+    }
+
+    const startEditing = (photo) => {
+        setEditingId(photo._id)
+        setEditUrl(photo.imageUrl)
+        setEditCaption(photo.caption || '')
+        setError('')
+    }
+
+    const cancelEditing = () => {
+        setEditingId(null)
+        setEditUrl('')
+        setEditCaption('')
+    }
+
+    const handleUpdate = async (e) => {
+        e.preventDefault()
+        setError('')
+        setUpdating(true)
+
+        try {
+            const token = sessionStorage.getItem('token')
+
+            const response = await fetch(
+                `/api/journals/${entryId}/photos/${editingId}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        imageUrl: editUrl,
+                        caption: editCaption,
+                    }),
+                }
+            )
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || 'Failed to update photo'
+                )
+            }
+
+            setPhotos((previous) =>
+                previous.map((photo) =>
+                    photo._id === data.photo._id
+                        ? data.photo
+                        : photo
+                )
+            )
+
+            cancelEditing()
+        } catch (err) {
+            setError(err.message)
+        } finally {
+            setUpdating(false)
+        }
+    }
+
+    const handleDelete = async (photoId) => {
+        const confirmed = window.confirm(
+            'Are you sure you want to delete this photo?'
+        )
+
+        if (!confirmed) return
+
+        setError('')
+        setDeletingId(photoId)
+
+        try {
+            const token = sessionStorage.getItem('token')
+
+            const response = await fetch(
+                `/api/journals/${entryId}/photos/${photoId}`,
+                {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || 'Failed to delete photo'
+                )
+            }
+
+            setPhotos((previous) =>
+                previous.filter((photo) => photo._id !== photoId)
+            )
+
+            if (editingId === photoId) {
+                cancelEditing()
+            }
+        } catch (err) {
+            setError(err.message)
+        } finally {
+            setDeletingId(null)
         }
     }
 
@@ -112,7 +212,6 @@ function PhotoGallery({ entryId }) {
                     <label htmlFor={`photo-url-${entryId}`}>
                         Photo URL
                     </label>
-
                     <input
                         id={`photo-url-${entryId}`}
                         type="url"
@@ -128,13 +227,11 @@ function PhotoGallery({ entryId }) {
                     <label htmlFor={`photo-caption-${entryId}`}>
                         Caption (optional)
                     </label>
-
                     <input
                         id={`photo-caption-${entryId}`}
                         type="text"
                         value={caption}
                         onChange={(e) => setCaption(e.target.value)}
-                        placeholder="Describe this memory"
                         maxLength={300}
                     />
                 </div>
@@ -184,14 +281,87 @@ function PhotoGallery({ entryId }) {
                             />
 
                             {photo.caption && (
-                                <figcaption
-                                    style={{
-                                        marginTop: '8px',
-                                        fontSize: '14px',
-                                    }}
-                                >
+                                <figcaption style={{ marginTop: '8px' }}>
                                     {photo.caption}
                                 </figcaption>
+                            )}
+
+                            {editingId === photo._id ? (
+                                <form
+                                    onSubmit={handleUpdate}
+                                    style={{ marginTop: '10px' }}
+                                >
+                                    <div>
+                                        <label htmlFor={`edit-url-${photo._id}`}>
+                                            Edit Photo URL
+                                        </label>
+                                        <input
+                                            id={`edit-url-${photo._id}`}
+                                            type="url"
+                                            value={editUrl}
+                                            onChange={(e) =>
+                                                setEditUrl(e.target.value)
+                                            }
+                                            maxLength={2000}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label
+                                            htmlFor={`edit-caption-${photo._id}`}
+                                        >
+                                            Edit Caption
+                                        </label>
+                                        <input
+                                            id={`edit-caption-${photo._id}`}
+                                            type="text"
+                                            value={editCaption}
+                                            onChange={(e) =>
+                                                setEditCaption(e.target.value)
+                                            }
+                                            maxLength={300}
+                                        />
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={updating}
+                                    >
+                                        {updating
+                                            ? 'Saving...'
+                                            : 'Save Changes'}
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={cancelEditing}
+                                        disabled={updating}
+                                    >
+                                        Cancel
+                                    </button>
+                                </form>
+                            ) : (
+                                <div style={{ marginTop: '10px' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => startEditing(photo)}
+                                    >
+                                        Edit
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            handleDelete(photo._id)
+                                        }
+                                        disabled={deletingId === photo._id}
+                                    >
+                                        {deletingId === photo._id
+                                            ? 'Deleting...'
+                                            : 'Delete'}
+                                    </button>
+                                </div>
                             )}
                         </figure>
                     ))}
