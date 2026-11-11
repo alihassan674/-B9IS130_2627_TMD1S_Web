@@ -7,6 +7,7 @@ const authRoutes = require('./src/routes/authRoutes');
 const tripRoutes = require('./src/routes/tripRoutes')
 const journalRoutes = require('./src/routes/journalRoutes')
 const photoRoutes = require('./src/routes/photoRoutes')
+const expenseRoutes = require('./src/routes/expenseRoutes')
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -21,6 +22,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/trips', tripRoutes)
 app.use('/api/trips/:tripId/journals', journalRoutes)
 app.use('/api/journals/:entryId/photos', photoRoutes)
+app.use('/api/trips/:tripId/expenses', expenseRoutes)
 
 // ── 404 handler ──────────────────────────────────────────────
 app.use((req, res) => {

@@ -30,12 +30,14 @@ TravelLog/
 │   │   ├── middleware/
 │   │   │   └── authMiddleware.js # JWT Bearer route protection guard
 │   │   ├── models/
+│   │   │   ├── Expense.js       # Expense schema, category enum & validations (Task 17)
 │   │   │   ├── JournalEntry.js  # Journal schema & date indexing
 │   │   │   ├── Photo.js         # Photo URL & caption schema (Task 14)
 │   │   │   ├── Trip.js          # Trip schema & date validations
 │   │   │   └── User.js          # User schema & validation rules
 │   │   └── routes/
 │   │       ├── authRoutes.js    # /register, /login, and /me endpoints
+│   │       ├── expenseRoutes.js # Nested expense CRUD & cents total (Task 17)
 │   │       ├── index.js         # GET /api/health
 │   │       ├── journalRoutes.js # Nested journal entry CRUD routes
 │   │       ├── photoRoutes.js   # Nested photo CRUD routes (Task 14)
@@ -287,6 +289,11 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | `GET` | `/api/journals/:entryId/photos/:photoId` | View single photo record (Task 14) | 🔒 Protected (Bearer Token) |
 | `PUT` | `/api/journals/:entryId/photos/:photoId` | Update photo URL or caption (Task 14) | 🔒 Protected (Bearer Token) |
 | `DELETE` | `/api/journals/:entryId/photos/:photoId` | Delete photo record (Task 14) | 🔒 Protected (Bearer Token) |
+| `POST` | `/api/trips/:tripId/expenses` | Record a trip expense (Task 17) | 🔒 Protected (Bearer Token) |
+| `GET` | `/api/trips/:tripId/expenses` | List trip expenses & accurate total (Task 17) | 🔒 Protected (Bearer Token) |
+| `GET` | `/api/trips/:tripId/expenses/:expenseId` | View single expense record (Task 17) | 🔒 Protected (Bearer Token) |
+| `PUT` | `/api/trips/:tripId/expenses/:expenseId` | Update expense record (Task 17) | 🔒 Protected (Bearer Token) |
+| `DELETE` | `/api/trips/:tripId/expenses/:expenseId` | Delete expense record (Task 17) | 🔒 Protected (Bearer Token) |
 
 > More endpoints will be added per task. See [`Requirement-Analysis-&-Plan.md`](./Requirement-Analysis-&-Plan.md) → Appendix B for the full planned API.
 
@@ -312,8 +319,9 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 14 | Travel Photos backend model & CRUD endpoints (`Photo.js`, `photoRoutes.js`) | ✅ Done |
 | Task 15 | Travel Photos frontend gallery & add form (`PhotoGallery.jsx`) | ✅ Done |
 | Task 16 | Travel Photos Edit and Delete functionality (`PhotoGallery.jsx`) | ✅ Done |
-| Task 17 | Expenses tracking & trip sharing | 🔲 Upcoming |
-| Task 18 | Final testing, deployment & submission | 🔲 Upcoming |
+| Task 17 | Trip Expenses backend model, total calculation & CRUD API (`Expense.js`, `expenseRoutes.js`) | ✅ Done |
+| Task 18 | Trip Expenses frontend UI & public trip sharing | 🔲 Upcoming |
+| Task 19 | Final testing, deployment & submission | 🔲 Upcoming |
 
 ---
 
