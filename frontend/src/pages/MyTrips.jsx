@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import CreateTrip from './CreateTrip'
 import EditTrip from './EditTrip'
 import JournalEntries from './JournalEntries'
+import TripExpenses from './TripExpenses'
 
 function MyTrips() {
     const [trips, setTrips] = useState([])
@@ -11,6 +12,7 @@ function MyTrips() {
     const [editingTrip, setEditingTrip] = useState(null)
     const [deletingId, setDeletingId] = useState(null)
     const [selectedJournalTripId, setSelectedJournalTripId] = useState(null)
+    const [selectedExpenseTripId, setSelectedExpenseTripId] = useState(null)
 
     useEffect(() => {
         const fetchTrips = async () => {
@@ -54,10 +56,6 @@ function MyTrips() {
             )
         )
 
-        if (selectedJournalTripId === tripId) {
-            setSelectedJournalTripId(null)
-        }
-
         setEditingTrip(null)
     }
 
@@ -93,6 +91,14 @@ function MyTrips() {
 
             if (editingTrip?._id === tripId) {
                 setEditingTrip(null)
+            }
+
+            if (selectedJournalTripId === tripId) {
+                setSelectedJournalTripId(null)
+            }
+
+            if (selectedExpenseTripId === tripId) {
+                setSelectedExpenseTripId(null)
             }
         } catch (err) {
             setError(err.message)
@@ -194,6 +200,25 @@ function MyTrips() {
 
                             {selectedJournalTripId === trip._id && (
                                 <JournalEntries tripId={trip._id} />
+                            )}
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setSelectedExpenseTripId(
+                                        selectedExpenseTripId === trip._id
+                                            ? null
+                                            : trip._id
+                                    )
+                                }
+                            >
+                                {selectedExpenseTripId === trip._id
+                                    ? 'Hide Expenses'
+                                    : 'View Expenses'}
+                            </button>
+
+                            {selectedExpenseTripId === trip._id && (
+                                <TripExpenses tripId={trip._id} />
                             )}
                         </div>
                     ))}
