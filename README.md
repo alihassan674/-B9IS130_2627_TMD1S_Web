@@ -53,9 +53,10 @@ TravelLog/
 │   │   │   ├── Dashboard.jsx    # Protected dashboard view
 │   │   │   ├── EditJournalEntry.jsx   # Journal entry editing form component (Task 13)
 │   │   │   ├── EditTrip.jsx     # Trip editing form component (Task 9)
-│   │   │   ├── JournalEntries.jsx # Journal list, edit & delete controls (Task 11 & 13)
+│   │   │   ├── JournalEntries.jsx # Journal list, controls & embedded PhotoGallery
 │   │   │   ├── Login.jsx        # Login form component
 │   │   │   ├── MyTrips.jsx      # Trips list, edit & delete controls
+│   │   │   ├── PhotoGallery.jsx # Travel photo gallery & add form (Task 15)
 │   │   │   └── Register.jsx     # Registration form component
 │   │   ├── App.css              # Consolidated stylesheet
 │   │   ├── App.jsx              # Main app auth router & session management
@@ -307,8 +308,9 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 12 | Journal creation form & chronological timeline display (`CreateJournalEntry.jsx`) | ✅ Done |
 | Task 13 | Journal entry Edit and Delete functionality (`EditJournalEntry.jsx` & `JournalEntries.jsx`) | ✅ Done |
 | Task 14 | Travel Photos backend model & CRUD endpoints (`Photo.js`, `photoRoutes.js`) | ✅ Done |
-| Task 15 | Travel Photos frontend gallery UI, expenses & sharing | 🔲 Upcoming |
-| Task 16 | Final testing, deployment, report & presentation | 🔲 Upcoming |
+| Task 15 | Travel Photos frontend gallery & add form (`PhotoGallery.jsx`) | ✅ Done |
+| Task 16 | Photo edit/delete controls, expenses & sharing | 🔲 Upcoming |
+| Task 17 | Final testing, deployment, report & presentation | 🔲 Upcoming |
 
 ---
 

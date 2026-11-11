@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import CreateJournalEntry from './CreateJournalEntry'
 import EditJournalEntry from './EditJournalEntry'
+import PhotoGallery from './PhotoGallery'
 
 function JournalEntries({ tripId }) {
     const [entries, setEntries] = useState([])
@@ -179,6 +180,8 @@ function JournalEntries({ tripId }) {
                             </p>
 
                             <p>{entry.content}</p>
+
+                            <PhotoGallery entryId={entry._id} />
 
                             <button
                                 type="button"
