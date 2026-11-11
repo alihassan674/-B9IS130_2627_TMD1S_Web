@@ -25,3 +25,11 @@ Thumbs.db
 # ── Vite ──────────────────────────────────────────────────────
 frontend/.vite/
 
+# ── University / Internal Docs ────────────────────────────────
+Presentaion&DemoUniversity.md
+Requirement-Analysis-&-Plan.md
+Technical-Report-University-Project.md
+specification.md
+testinglist.md
+
+
