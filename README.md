@@ -31,12 +31,14 @@ TravelLog/
 │   │   │   └── authMiddleware.js # JWT Bearer route protection guard
 │   │   ├── models/
 │   │   │   ├── JournalEntry.js  # Journal schema & date indexing
+│   │   │   ├── Photo.js         # Photo URL & caption schema (Task 14)
 │   │   │   ├── Trip.js          # Trip schema & date validations
 │   │   │   └── User.js          # User schema & validation rules
 │   │   └── routes/
 │   │       ├── authRoutes.js    # /register, /login, and /me endpoints
 │   │       ├── index.js         # GET /api/health
 │   │       ├── journalRoutes.js # Nested journal entry CRUD routes
+│   │       ├── photoRoutes.js   # Nested photo CRUD routes (Task 14)
 │   │       └── tripRoutes.js    # Trip CRUD endpoints
 │   ├── package.json             # Express, Mongoose, bcryptjs, JWT, cors, dotenv
 │   └── server.js                # Entry point: Express, middleware, routes
@@ -277,6 +279,11 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | `GET` | `/api/trips/:tripId/journals/:entryId` | View single journal entry (Task 10) | 🔒 Protected (Bearer Token) |
 | `PUT` | `/api/trips/:tripId/journals/:entryId` | Update journal entry (Task 10) | 🔒 Protected (Bearer Token) |
 | `DELETE` | `/api/trips/:tripId/journals/:entryId` | Delete journal entry (Task 10) | 🔒 Protected (Bearer Token) |
+| `POST` | `/api/journals/:entryId/photos` | Attach image URL & caption to entry (Task 14) | 🔒 Protected (Bearer Token) |
+| `GET` | `/api/journals/:entryId/photos` | List all photos for an entry (Task 14) | 🔒 Protected (Bearer Token) |
+| `GET` | `/api/journals/:entryId/photos/:photoId` | View single photo record (Task 14) | 🔒 Protected (Bearer Token) |
+| `PUT` | `/api/journals/:entryId/photos/:photoId` | Update photo URL or caption (Task 14) | 🔒 Protected (Bearer Token) |
+| `DELETE` | `/api/journals/:entryId/photos/:photoId` | Delete photo record (Task 14) | 🔒 Protected (Bearer Token) |
 
 > More endpoints will be added per task. See [`Requirement-Analysis-&-Plan.md`](./Requirement-Analysis-&-Plan.md) → Appendix B for the full planned API.
 
@@ -299,8 +306,9 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 11 | Journal entries frontend listing & toggle UI (`JournalEntries.jsx`) | ✅ Done |
 | Task 12 | Journal creation form & chronological timeline display (`CreateJournalEntry.jsx`) | ✅ Done |
 | Task 13 | Journal entry Edit and Delete functionality (`EditJournalEntry.jsx` & `JournalEntries.jsx`) | ✅ Done |
-| Task 14 | Photos, expenses, sharing & public page | 🔲 Upcoming |
-| Task 15 | Final testing, deployment, report & presentation | 🔲 Upcoming |
+| Task 14 | Travel Photos backend model & CRUD endpoints (`Photo.js`, `photoRoutes.js`) | ✅ Done |
+| Task 15 | Travel Photos frontend gallery UI, expenses & sharing | 🔲 Upcoming |
+| Task 16 | Final testing, deployment, report & presentation | 🔲 Upcoming |
 
 ---
 
