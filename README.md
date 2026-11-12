@@ -60,7 +60,7 @@ TravelLog/
 │   │   │   ├── MyTrips.jsx      # Trips list, edit, delete, journal & expense toggles
 │   │   │   ├── PhotoGallery.jsx # Travel photo gallery, add, edit & delete (Tasks 15 & 16)
 │   │   │   ├── Register.jsx     # Registration form component
-│   │   │   └── TripExpenses.jsx # Trip expenses summary, add form & history UI (Task 18)
+│   │   │   └── TripExpenses.jsx # Trip expenses summary, add, edit & delete UI (Tasks 18 & 19)
 │   │   ├── App.css              # Consolidated stylesheet
 │   │   ├── App.jsx              # Main app auth router & session management
 │   │   └── main.jsx             # React entry point
@@ -68,13 +68,8 @@ TravelLog/
 │   ├── package.json             # Minimal dependencies (React 19 + Vite)
 │   └── vite.config.js           # Vite + /api proxy config
 │
-├── .gitignore                   # Ignores node_modules, .env, dist, logs
-├── Presentaion&DemoUniversity.md # University presentation slides & live demo script
-├── README.md                    # Setup guide and documentation
-├── Requirement-Analysis-&-Plan.md # Academic requirements & plan
-├── Technical-Report-University-Project.md # Formal university technical report
-├── specification.md             # Detailed task log & implementation notes
-└── testinglist.md               # Testing checklist & verification log
+├── .gitignore                   # Ignores node_modules, .env, dist, logs, and internal docs
+└── README.md                    # Setup guide and documentation
 ```
 
 ---
@@ -322,14 +317,10 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 16 | Travel Photos Edit and Delete functionality (`PhotoGallery.jsx`) | ✅ Done |
 | Task 17 | Trip Expenses backend model, total calculation & CRUD API (`Expense.js`, `expenseRoutes.js`) | ✅ Done |
 | Task 18 | Trip Expenses frontend UI, add form & total summary (`TripExpenses.jsx`, `MyTrips.jsx`) | ✅ Done |
-| Task 19 | Public trip sharing (`isShared` / `shareToken`) & Expense Edit/Delete UI | 🔲 Upcoming |
-| Task 20 | Final testing, deployment & submission | 🔲 Upcoming |
+| Task 19 | Trip Expenses Edit and Delete functionality (`TripExpenses.jsx`) | ✅ Done |
+| Task 20 | Public trip sharing (`isShared` / `shareToken`) | 🔲 Upcoming |
+| Task 21 | Final testing, deployment & submission | 🔲 Upcoming |
 
 ---
 
-## See Also
-
-- [`specification.md`](./specification.md) — detailed task log with implementation notes
-- [`Requirement-Analysis-&-Plan.md`](./Requirement-Analysis-&-Plan.md) — full academic requirements analysis
-- [`Technical-Report-University-Project.md`](./Technical-Report-University-Project.md) — formal technical report for university submission
-- [`Presentaion&DemoUniversity.md`](./Presentaion&DemoUniversity.md) — presentation outline & live demo guide
+> Internal university planning, specification, testing checklists, report, and presentation notes are kept locally via `.gitignore`. Only `README.md` and application source code are tracked in Git.
