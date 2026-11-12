@@ -277,12 +277,12 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | `GET` | `/api/trips` | List all trips for authenticated user | 🔒 Protected (Bearer Token) |
 | `GET` | `/api/trips/:id` | Get details of a single owned trip | 🔒 Protected (Bearer Token) |
 | `PUT` | `/api/trips/:id` | Update destination, dates, or details (Task 9) | 🔒 Protected (Bearer Token) |
-| `DELETE` | `/api/trips/:id` | Delete an owned trip (Task 9) | 🔒 Protected (Bearer Token) |
+| `DELETE` | `/api/trips/:id` | Delete an owned trip & cascade-delete child journals, photos, expenses atomically (Tasks 9 & 24) | 🔒 Protected (Bearer Token) |
 | `POST` | `/api/trips/:tripId/journals` | Add a journal entry to a trip (Task 10) | 🔒 Protected (Bearer Token) |
 | `GET` | `/api/trips/:tripId/journals` | View journal entries for a trip (Task 10) | 🔒 Protected (Bearer Token) |
 | `GET` | `/api/trips/:tripId/journals/:entryId` | View single journal entry (Task 10) | 🔒 Protected (Bearer Token) |
 | `PUT` | `/api/trips/:tripId/journals/:entryId` | Update journal entry (Task 10) | 🔒 Protected (Bearer Token) |
-| `DELETE` | `/api/trips/:tripId/journals/:entryId` | Delete journal entry (Task 10) | 🔒 Protected (Bearer Token) |
+| `DELETE` | `/api/trips/:tripId/journals/:entryId` | Delete journal entry & cascade-delete child photos atomically (Tasks 10 & 25) | 🔒 Protected (Bearer Token) |
 | `POST` | `/api/journals/:entryId/photos` | Attach image URL & caption to entry (Task 14) | 🔒 Protected (Bearer Token) |
 | `GET` | `/api/journals/:entryId/photos` | List all photos for an entry (Task 14) | 🔒 Protected (Bearer Token) |
 | `GET` | `/api/journals/:entryId/photos/:photoId` | View single photo record (Task 14) | 🔒 Protected (Bearer Token) |
@@ -326,7 +326,9 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 21 | Public trip sharing backend API (`publicRoutes.js`, `tripRoutes.js` `isPublic`) | ✅ Done |
 | Task 22 | Public trip sharing frontend page UI (`PublicTrip.jsx`, `App.jsx` `/shared/:tripId`) | ✅ Done |
 | Task 23 | Share Link & Privacy Controls UI (`MyTrips.jsx` — Make Public/Private toggle & Copy Share Link) | ✅ Done |
-| Task 24 | Final testing, deployment & submission | 🔲 Upcoming |
+| Task 24 | Database trip cascade deletion with atomic MongoDB transactions (trips, journals, photos, expenses) | ✅ Done |
+| Task 25 | Database journal cascade deletion & photo cleanup with atomic MongoDB transactions | ✅ Done |
+| Task 26 | Final testing, deployment & submission | 🔲 Upcoming |
 
 ---
 

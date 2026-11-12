@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const Trip = require('../models/Trip')
 const JournalEntry = require('../models/JournalEntry')
 const protect = require('../middleware/authMiddleware')
+const Photo = require('../models/Photo')
 
 const router = express.Router({ mergeParams: true })
 
@@ -170,28 +171,88 @@ router.put('/:entryId', async (req, res) => {
 })
 
 // DELETE - Delete a journal entry
-router.delete('/:entryId', async (req, res) => {
-    try {
-        const entry = await JournalEntry.findOneAndDelete({
-            _id: req.params.entryId,
-            trip: req.trip._id,
-        })
 
-        if (!entry) {
-            return res.status(404).json({
-                message: 'Journal entry not found',
+// DELETE /api/trips/:tripId/journals/:entryId
+// Delete an owned journal entry and its photos
+router.delete('/:entryId', async (req, res) => {
+    let session
+
+    try {
+        const { tripId, entryId } = req.params
+
+        // Validate both MongoDB IDs
+        if (
+            !mongoose.isValidObjectId(tripId) ||
+            !mongoose.isValidObjectId(entryId)
+        ) {
+            return res.status(400).json({
+                message: 'Invalid trip or journal entry ID',
             })
         }
 
+        session = await mongoose.startSession()
+
+        await session.withTransaction(async () => {
+            // Verify trip ownership
+            const trip = await Trip.findOne({
+                _id: tripId,
+                user: req.user.id,
+            }).session(session)
+
+            if (!trip) {
+                const error = new Error('Trip not found')
+                error.statusCode = 404
+                throw error
+            }
+
+            // Verify the journal belongs to this trip
+            const entry = await JournalEntry.findOne({
+                _id: entryId,
+                trip: trip._id,
+            }).session(session)
+
+            if (!entry) {
+                const error = new Error(
+                    'Journal entry not found'
+                )
+                error.statusCode = 404
+                throw error
+            }
+
+            // Delete all photos belonging to this journal
+            await Photo.deleteMany({
+                journalEntry: entry._id,
+            }).session(session)
+
+            // Delete the journal entry
+            await JournalEntry.deleteOne({
+                _id: entry._id,
+                trip: trip._id,
+            }).session(session)
+        })
+
         res.status(200).json({
-            message: 'Journal entry deleted successfully',
+            message:
+                'Journal entry and related photos deleted successfully',
         })
     } catch (error) {
+        if (error.statusCode === 404) {
+            return res.status(404).json({
+                message: error.message,
+            })
+        }
+
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to delete journal entry',
         })
+    } finally {
+        if (session) {
+            await session.endSession()
+        }
     }
 })
+
 
 module.exports = router
