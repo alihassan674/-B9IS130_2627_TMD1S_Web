@@ -2,6 +2,9 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const Trip = require('../models/Trip')
+const JournalEntry = require('../models/JournalEntry')
+const Photo = require('../models/Photo')
+const Expense = require('../models/Expense')
 const protect = require('../middleware/authMiddleware')
 
 const router = express.Router()
@@ -170,27 +173,81 @@ router.put('/:id', async (req, res) => {
 })
 
 // DELETE /api/trips/:id - Delete an owned trip
+
+// DELETE /api/trips/:id
+// Delete an owned trip and its related data
 router.delete('/:id', async (req, res) => {
+    let session
+
     try {
-        const trip = await Trip.findOneAndDelete({
-            _id: req.params.id,
-            user: req.user.id,
+        session = await mongoose.startSession()
+
+        await session.withTransaction(async () => {
+            // Verify ownership before deleting anything
+            const trip = await Trip.findOne({
+                _id: req.params.id,
+                user: req.user.id,
+            }).session(session)
+
+            if (!trip) {
+                const error = new Error('Trip not found')
+                error.statusCode = 404
+                throw error
+            }
+
+            // Find all journal entries belonging to this trip
+            const entries = await JournalEntry.find({
+                trip: trip._id,
+            })
+                .select('_id')
+                .session(session)
+
+            const entryIds = entries.map(
+                (entry) => entry._id
+            )
+
+            // Delete photos belonging to these entries
+            await Photo.deleteMany({
+                journalEntry: { $in: entryIds },
+            }).session(session)
+
+            // Delete all journal entries
+            await JournalEntry.deleteMany({
+                trip: trip._id,
+            }).session(session)
+
+            // Delete all expenses
+            await Expense.deleteMany({
+                trip: trip._id,
+            }).session(session)
+
+            // Finally delete the trip
+            await Trip.deleteOne({
+                _id: trip._id,
+                user: req.user.id,
+            }).session(session)
         })
 
-        if (!trip) {
+        res.status(200).json({
+            message:
+                'Trip and related records deleted successfully',
+        })
+    } catch (error) {
+        if (error.statusCode === 404) {
             return res.status(404).json({
                 message: 'Trip not found',
             })
         }
 
-        res.status(200).json({
-            message: 'Trip deleted successfully',
-        })
-    } catch (error) {
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to delete trip',
         })
+    } finally {
+        if (session) {
+            await session.endSession()
+        }
     }
 })
 
