@@ -61,6 +61,66 @@ function MyTrips() {
         setEditingTrip(null)
     }
 
+
+    const handleTogglePublic = async (trip) => {
+        const newStatus = !trip.isPublic
+
+        try {
+            const token = sessionStorage.getItem('token')
+
+            const response = await fetch(
+                `/api/trips/${trip._id}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        isPublic: newStatus,
+                    }),
+                }
+            )
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || 'Failed to update sharing settings'
+                )
+            }
+
+            // Update the trip immediately in React
+            setTrips((previousTrips) =>
+                previousTrips.map((existingTrip) =>
+                    existingTrip._id === trip._id
+                        ? data.trip
+                        : existingTrip
+                )
+            )
+
+        } catch (error) {
+            alert(error.message)
+        }
+    }
+
+
+    const handleCopyShareLink = async (tripId) => {
+        const shareUrl =
+            `${window.location.origin}/shared/${tripId}`
+
+        try {
+            await navigator.clipboard.writeText(shareUrl)
+
+            alert('Share link copied successfully!')
+        } catch (error) {
+            alert(
+                `Unable to copy automatically. Share this link: ${shareUrl}`
+            )
+        }
+    }
+
+
     const handleDelete = async (tripId) => {
         const confirmed = window.confirm(
             'Are you sure you want to delete this trip?'
@@ -246,6 +306,38 @@ function MyTrips() {
                             {selectedTimelineTripId === trip._id && (
                                 <TripTimeline tripId={trip._id} />
                             )}
+
+
+                            <div
+                                style={{
+                                    marginTop: '12px',
+                                    display: 'flex',
+                                    gap: '10px',
+                                    flexWrap: 'wrap',
+                                }}
+                            >
+                                <button
+                                    type="button"
+                                    onClick={() => handleTogglePublic(trip)}
+                                >
+                                    {trip.isPublic ? 'Make Private' : 'Make Public'}
+                                </button>
+
+                                {trip.isPublic && (
+                                    <button
+                                        type="button"
+                                        onClick={() => handleCopyShareLink(trip._id)}
+                                    >
+                                        Copy Share Link
+                                    </button>
+                                )}
+
+                                <p style={{ width: '100%', margin: 0 }}>
+                                    <strong>Sharing Status: </strong>
+                                    {trip.isPublic ? 'Public' : 'Private'}
+                                </p>
+                            </div>
+
 
                         </div>
                     ))}

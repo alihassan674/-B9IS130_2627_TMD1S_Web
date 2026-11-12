@@ -325,7 +325,8 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 20 | Chronological Trip Timeline UI (`TripTimeline.jsx`, `MyTrips.jsx`) | ✅ Done |
 | Task 21 | Public trip sharing backend API (`publicRoutes.js`, `tripRoutes.js` `isPublic`) | ✅ Done |
 | Task 22 | Public trip sharing frontend page UI (`PublicTrip.jsx`, `App.jsx` `/shared/:tripId`) | ✅ Done |
-| Task 23 | Final testing, deployment & submission | 🔲 Upcoming |
+| Task 23 | Share Link & Privacy Controls UI (`MyTrips.jsx` — Make Public/Private toggle & Copy Share Link) | ✅ Done |
+| Task 24 | Final testing, deployment & submission | 🔲 Upcoming |
 
 ---
 
