@@ -4,6 +4,7 @@ import CreateTrip from './CreateTrip'
 import EditTrip from './EditTrip'
 import JournalEntries from './JournalEntries'
 import TripExpenses from './TripExpenses'
+import TripTimeline from './TripTimeline'
 
 function MyTrips() {
     const [trips, setTrips] = useState([])
@@ -13,6 +14,7 @@ function MyTrips() {
     const [deletingId, setDeletingId] = useState(null)
     const [selectedJournalTripId, setSelectedJournalTripId] = useState(null)
     const [selectedExpenseTripId, setSelectedExpenseTripId] = useState(null)
+    const [selectedTimelineTripId, setSelectedTimelineTripId] = useState(null)
 
     useEffect(() => {
         const fetchTrips = async () => {
@@ -100,6 +102,11 @@ function MyTrips() {
             if (selectedExpenseTripId === tripId) {
                 setSelectedExpenseTripId(null)
             }
+
+            if (selectedTimelineTripId === tripId) {
+                setSelectedTimelineTripId(null)
+            }
+
         } catch (err) {
             setError(err.message)
         } finally {
@@ -220,6 +227,26 @@ function MyTrips() {
                             {selectedExpenseTripId === trip._id && (
                                 <TripExpenses tripId={trip._id} />
                             )}
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setSelectedTimelineTripId(
+                                        selectedTimelineTripId === trip._id
+                                            ? null
+                                            : trip._id
+                                    )
+                                }
+                            >
+                                {selectedTimelineTripId === trip._id
+                                    ? 'Hide Timeline'
+                                    : 'View Timeline'}
+                            </button>
+
+                            {selectedTimelineTripId === trip._id && (
+                                <TripTimeline tripId={trip._id} />
+                            )}
+
                         </div>
                     ))}
                 </div>
