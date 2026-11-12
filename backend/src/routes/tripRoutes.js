@@ -15,6 +15,7 @@ const allowedFields = [
     'startDate',
     'endDate',
     'description',
+    'isPublic', // NEW: Allow public sharing
 ]
 
 // POST /api/trips - Create a new trip
@@ -28,6 +29,16 @@ router.post('/', async (req, res) => {
             }
         }
 
+        // NEW: Validate isPublic when provided
+        if (
+            tripData.isPublic !== undefined &&
+            typeof tripData.isPublic !== 'boolean'
+        ) {
+            return res.status(400).json({
+                message: 'isPublic must be true or false',
+            })
+        }
+
         const trip = await Trip.create({
             ...tripData,
             user: req.user.id,
@@ -38,8 +49,10 @@ router.post('/', async (req, res) => {
             trip,
         })
     } catch (error) {
-        if (error.name === 'ValidationError' ||
-            error.name === 'CastError') {
+        if (
+            error.name === 'ValidationError' ||
+            error.name === 'CastError'
+        ) {
             return res.status(400).json({
                 message: error.message,
             })
@@ -116,6 +129,17 @@ router.put('/:id', async (req, res) => {
             })
         }
 
+        // NEW: Validate public sharing value
+        if (
+            req.body.isPublic !== undefined &&
+            typeof req.body.isPublic !== 'boolean'
+        ) {
+            return res.status(400).json({
+                message: 'isPublic must be true or false',
+            })
+        }
+
+        // Update only permitted fields
         for (const field of allowedFields) {
             if (req.body[field] !== undefined) {
                 trip[field] = req.body[field]
@@ -129,8 +153,10 @@ router.put('/:id', async (req, res) => {
             trip,
         })
     } catch (error) {
-        if (error.name === 'ValidationError' ||
-            error.name === 'CastError') {
+        if (
+            error.name === 'ValidationError' ||
+            error.name === 'CastError'
+        ) {
             return res.status(400).json({
                 message: error.message,
             })
