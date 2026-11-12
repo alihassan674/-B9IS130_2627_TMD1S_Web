@@ -57,10 +57,11 @@ TravelLog/
 │   │   │   ├── EditTrip.jsx     # Trip editing form component (Task 9)
 │   │   │   ├── JournalEntries.jsx # Journal list, controls & embedded PhotoGallery
 │   │   │   ├── Login.jsx        # Login form component
-│   │   │   ├── MyTrips.jsx      # Trips list, edit, delete, journal & expense toggles
+│   │   │   ├── MyTrips.jsx      # Trips list, edit, delete, journal, expense & timeline toggles
 │   │   │   ├── PhotoGallery.jsx # Travel photo gallery, add, edit & delete (Tasks 15 & 16)
 │   │   │   ├── Register.jsx     # Registration form component
-│   │   │   └── TripExpenses.jsx # Trip expenses summary, add, edit & delete UI (Tasks 18 & 19)
+│   │   │   ├── TripExpenses.jsx # Trip expenses summary, add, edit & delete UI (Tasks 18 & 19)
+│   │   │   └── TripTimeline.jsx # Vertical chronological trip timeline component (Task 20)
 │   │   ├── App.css              # Consolidated stylesheet
 │   │   ├── App.jsx              # Main app auth router & session management
 │   │   └── main.jsx             # React entry point
@@ -318,8 +319,9 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 17 | Trip Expenses backend model, total calculation & CRUD API (`Expense.js`, `expenseRoutes.js`) | ✅ Done |
 | Task 18 | Trip Expenses frontend UI, add form & total summary (`TripExpenses.jsx`, `MyTrips.jsx`) | ✅ Done |
 | Task 19 | Trip Expenses Edit and Delete functionality (`TripExpenses.jsx`) | ✅ Done |
-| Task 20 | Public trip sharing (`isShared` / `shareToken`) | 🔲 Upcoming |
-| Task 21 | Final testing, deployment & submission | 🔲 Upcoming |
+| Task 20 | Chronological Trip Timeline UI (`TripTimeline.jsx`, `MyTrips.jsx`) | ✅ Done |
+| Task 21 | Public trip sharing (`isShared` / `shareToken`) | 🔲 Upcoming |
+| Task 22 | Final testing, deployment & submission | 🔲 Upcoming |
 
 ---
 
