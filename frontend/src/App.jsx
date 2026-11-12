@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import './App.css'
+import PublicTrip from './pages/PublicTrip'
 
 function App() {
   const [page, setPage] = useState('login')
@@ -44,6 +45,8 @@ function App() {
     checkAuth()
   }, [])
 
+
+
   const handleAuthSuccess = (loggedInUser) => {
     setUser(loggedInUser)
   }
@@ -57,6 +60,16 @@ function App() {
   if (loading) {
     return <p>Checking authentication...</p>
   }
+
+
+  const sharedMatch = window.location.pathname.match(
+    /^\/shared\/([a-fA-F0-9]{24})\/?$/
+  )
+
+  if (sharedMatch) {
+    return <PublicTrip tripId={sharedMatch[1]} />
+  }
+
 
   if (user) {
     return (

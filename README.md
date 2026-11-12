@@ -41,7 +41,8 @@ TravelLog/
 │   │       ├── index.js         # GET /api/health
 │   │       ├── journalRoutes.js # Nested journal entry CRUD routes
 │   │       ├── photoRoutes.js   # Nested photo CRUD routes (Task 14)
-│   │       └── tripRoutes.js    # Trip CRUD endpoints
+│   │       ├── publicRoutes.js  # Public read-only shared trip route (Task 21)
+│   │       └── tripRoutes.js    # Trip CRUD endpoints & isPublic toggle
 │   ├── package.json             # Express, Mongoose, bcryptjs, JWT, cors, dotenv
 │   └── server.js                # Entry point: Express, middleware, routes
 │
@@ -59,6 +60,7 @@ TravelLog/
 │   │   │   ├── Login.jsx        # Login form component
 │   │   │   ├── MyTrips.jsx      # Trips list, edit, delete, journal, expense & timeline toggles
 │   │   │   ├── PhotoGallery.jsx # Travel photo gallery, add, edit & delete (Tasks 15 & 16)
+│   │   │   ├── PublicTrip.jsx   # Public read-only shared trip page (Task 22)
 │   │   │   ├── Register.jsx     # Registration form component
 │   │   │   ├── TripExpenses.jsx # Trip expenses summary, add, edit & delete UI (Tasks 18 & 19)
 │   │   │   └── TripTimeline.jsx # Vertical chronological trip timeline component (Task 20)
@@ -291,6 +293,7 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | `GET` | `/api/trips/:tripId/expenses/:expenseId` | View single expense record (Task 17) | 🔒 Protected (Bearer Token) |
 | `PUT` | `/api/trips/:tripId/expenses/:expenseId` | Update expense record (Task 17) | 🔒 Protected (Bearer Token) |
 | `DELETE` | `/api/trips/:tripId/expenses/:expenseId` | Delete expense record (Task 17) | 🔒 Protected (Bearer Token) |
+| `GET` | `/api/public/trips/:tripId` | View a public shared trip (entries & photos, no expenses) (Task 21) | ❌ Public |
 
 > More endpoints will be added per task. See [`Requirement-Analysis-&-Plan.md`](./Requirement-Analysis-&-Plan.md) → Appendix B for the full planned API.
 
@@ -320,8 +323,9 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 18 | Trip Expenses frontend UI, add form & total summary (`TripExpenses.jsx`, `MyTrips.jsx`) | ✅ Done |
 | Task 19 | Trip Expenses Edit and Delete functionality (`TripExpenses.jsx`) | ✅ Done |
 | Task 20 | Chronological Trip Timeline UI (`TripTimeline.jsx`, `MyTrips.jsx`) | ✅ Done |
-| Task 21 | Public trip sharing (`isShared` / `shareToken`) | 🔲 Upcoming |
-| Task 22 | Final testing, deployment & submission | 🔲 Upcoming |
+| Task 21 | Public trip sharing backend API (`publicRoutes.js`, `tripRoutes.js` `isPublic`) | ✅ Done |
+| Task 22 | Public trip sharing frontend page UI (`PublicTrip.jsx`, `App.jsx` `/shared/:tripId`) | ✅ Done |
+| Task 23 | Final testing, deployment & submission | 🔲 Upcoming |
 
 ---
 
