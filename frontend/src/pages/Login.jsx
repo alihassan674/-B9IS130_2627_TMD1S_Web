@@ -1,7 +1,7 @@
 
 import { useState } from 'react'
 
-function Login({ onAuthSuccess }) {
+function Login({ onAuthSuccess, onRegisterClick }) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
@@ -213,10 +213,20 @@ function Login({ onAuthSuccess }) {
                         <div className="tl-login-bottom">
                             <p>
                                 New to TravelLog?{' '}
-                                <span>
-                                    Create an account using the Register
-                                    option.
-                                </span>
+                                {onRegisterClick ? (
+                                    <button
+                                        type="button"
+                                        onClick={onRegisterClick}
+                                        className="tl-login-register-link"
+                                    >
+                                        Create an account
+                                    </button>
+                                ) : (
+                                    <span>
+                                        Create an account using the Register
+                                        option.
+                                    </span>
+                                )}
                             </p>
                         </div>
 
