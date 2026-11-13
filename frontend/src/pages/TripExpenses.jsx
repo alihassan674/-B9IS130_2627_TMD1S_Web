@@ -10,6 +10,15 @@ const categories = [
     'Other',
 ]
 
+const categoryIcons = {
+    Accommodation: '🏨',
+    Transport: '🚆',
+    Food: '🍽️',
+    Activities: '🎟️',
+    Shopping: '🛍️',
+    Other: '📌',
+}
+
 const emptyForm = {
     title: '',
     amount: '',
@@ -18,20 +27,129 @@ const emptyForm = {
     notes: '',
 }
 
+const formatAmount = (amount) =>
+    Number(amount || 0).toLocaleString('en-GB', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    })
+
+const formatDate = (date) => {
+    if (!date) return 'Date unavailable'
+
+    const [year, month, day] = date.slice(0, 10).split('-')
+
+    return new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day)
+    ).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+    })
+}
+
+function ExpenseFields({ values, onChange, prefix }) {
+    return (
+        <div className="expense-form-grid">
+            <div className="expense-field">
+                <label htmlFor={`${prefix}-title`}>
+                    Expense Title
+                </label>
+                <input
+                    id={`${prefix}-title`}
+                    name="title"
+                    type="text"
+                    value={values.title}
+                    onChange={onChange}
+                    placeholder="e.g. Hotel booking"
+                    maxLength={150}
+                    required
+                />
+            </div>
+
+            <div className="expense-field">
+                <label htmlFor={`${prefix}-amount`}>
+                    Amount
+                </label>
+                <input
+                    id={`${prefix}-amount`}
+                    name="amount"
+                    type="number"
+                    value={values.amount}
+                    onChange={onChange}
+                    placeholder="0.00"
+                    min="0.01"
+                    step="0.01"
+                    required
+                />
+            </div>
+
+            <div className="expense-field">
+                <label htmlFor={`${prefix}-category`}>
+                    Category
+                </label>
+                <select
+                    id={`${prefix}-category`}
+                    name="category"
+                    value={values.category}
+                    onChange={onChange}
+                    required
+                >
+                    {categories.map((category) => (
+                        <option key={category} value={category}>
+                            {category}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <div className="expense-field">
+                <label htmlFor={`${prefix}-date`}>
+                    Expense Date
+                </label>
+                <input
+                    id={`${prefix}-date`}
+                    name="expenseDate"
+                    type="date"
+                    value={values.expenseDate}
+                    onChange={onChange}
+                    required
+                />
+            </div>
+
+            <div className="expense-field expense-field-full">
+                <label htmlFor={`${prefix}-notes`}>
+                    Notes (optional)
+                </label>
+                <textarea
+                    id={`${prefix}-notes`}
+                    name="notes"
+                    value={values.notes}
+                    onChange={onChange}
+                    placeholder="Add details about this expense..."
+                    maxLength={1000}
+                    rows={3}
+                />
+            </div>
+        </div>
+    )
+}
+
 function TripExpenses({ tripId }) {
     const [expenses, setExpenses] = useState([])
     const [totalAmount, setTotalAmount] = useState(0)
     const [expenseCount, setExpenseCount] = useState(0)
-
     const [form, setForm] = useState({ ...emptyForm })
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState('')
-
     const [editingId, setEditingId] = useState(null)
     const [editForm, setEditForm] = useState({ ...emptyForm })
     const [updating, setUpdating] = useState(false)
     const [deletingId, setDeletingId] = useState(null)
+    const [search, setSearch] = useState('')
+    const [categoryFilter, setCategoryFilter] = useState('All')
 
     const fetchExpenses = async () => {
         const token = sessionStorage.getItem('token')
@@ -58,7 +176,6 @@ function TripExpenses({ tripId }) {
 
     const refreshExpenses = async () => {
         const data = await fetchExpenses()
-
         setExpenses(data.expenses)
         setTotalAmount(data.totalAmount)
         setExpenseCount(data.expenseCount)
@@ -70,9 +187,27 @@ function TripExpenses({ tripId }) {
         const loadExpenses = async () => {
             setLoading(true)
             setError('')
+            setExpenses([])
+            setEditingId(null)
 
             try {
-                const data = await fetchExpenses()
+                const token = sessionStorage.getItem('token')
+                const response = await fetch(
+                    `/api/trips/${tripId}/expenses`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                )
+
+                const data = await response.json()
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.message || 'Failed to fetch expenses'
+                    )
+                }
 
                 if (active) {
                     setExpenses(data.expenses)
@@ -95,6 +230,13 @@ function TripExpenses({ tripId }) {
 
     const handleChange = (e) => {
         setForm((previous) => ({
+            ...previous,
+            [e.target.name]: e.target.value,
+        }))
+    }
+
+    const handleEditChange = (e) => {
+        setEditForm((previous) => ({
             ...previous,
             [e.target.name]: e.target.value,
         }))
@@ -142,7 +284,6 @@ function TripExpenses({ tripId }) {
 
     const startEditing = (expense) => {
         setEditingId(expense._id)
-
         setEditForm({
             title: expense.title,
             amount: String(expense.amount),
@@ -150,15 +291,7 @@ function TripExpenses({ tripId }) {
             expenseDate: expense.expenseDate.slice(0, 10),
             notes: expense.notes || '',
         })
-
         setError('')
-    }
-
-    const handleEditChange = (e) => {
-        setEditForm((previous) => ({
-            ...previous,
-            [e.target.name]: e.target.value,
-        }))
     }
 
     const cancelEditing = () => {
@@ -249,281 +382,246 @@ function TripExpenses({ tripId }) {
         }
     }
 
-    if (loading) {
-        return <p>Loading expenses...</p>
-    }
+    const categoryTotals = categories.map((category) => ({
+        category,
+        total: expenses
+            .filter((expense) => expense.category === category)
+            .reduce(
+                (sum, expense) => sum + Number(expense.amount),
+                0
+            ),
+    }))
+
+    const filteredExpenses = expenses
+        .filter((expense) => {
+            const query = search.trim().toLowerCase()
+            const matchesSearch =
+                expense.title.toLowerCase().includes(query) ||
+                (expense.notes || '').toLowerCase().includes(query)
+
+            const matchesCategory =
+                categoryFilter === 'All' ||
+                expense.category === categoryFilter
+
+            return matchesSearch && matchesCategory
+        })
+        .sort(
+            (a, b) =>
+                new Date(b.expenseDate) - new Date(a.expenseDate)
+        )
 
     return (
-        <section>
-            <h4>Trip Expenses</h4>
-
-            <h3>
-                Total Spending: {totalAmount.toFixed(2)}
-            </h3>
-
-            <p>Number of Expenses: {expenseCount}</p>
-
-            <hr />
-
-            <h4>Add Expense</h4>
-
-            <form onSubmit={handleSubmit}>
+        <section className="trip-expenses">
+            <div className="expense-header">
                 <div>
-                    <label htmlFor={`expense-title-${tripId}`}>
-                        Expense Title
-                    </label>
-                    <input
-                        id={`expense-title-${tripId}`}
-                        type="text"
-                        name="title"
-                        value={form.title}
-                        onChange={handleChange}
-                        maxLength={150}
-                        required
-                    />
+                    <span className="expense-eyebrow">
+                        TRAVEL BUDGET
+                    </span>
+                    <h3>Trip Expenses</h3>
+                    <p>Keep track of your travel spending.</p>
                 </div>
+                <span className="expense-header-icon">💳</span>
+            </div>
 
-                <div>
-                    <label htmlFor={`expense-amount-${tripId}`}>
-                        Amount
-                    </label>
-                    <input
-                        id={`expense-amount-${tripId}`}
-                        type="number"
-                        name="amount"
-                        value={form.amount}
-                        onChange={handleChange}
-                        min="0.01"
-                        step="0.01"
-                        required
-                    />
-                </div>
+            {error && (
+                <p className="expense-error" role="alert">
+                    {error}
+                </p>
+            )}
 
-                <div>
-                    <label htmlFor={`expense-category-${tripId}`}>
-                        Category
-                    </label>
-                    <select
-                        id={`expense-category-${tripId}`}
-                        name="category"
-                        value={form.category}
-                        onChange={handleChange}
-                        required
-                    >
-                        {categories.map((category) => (
-                            <option key={category} value={category}>
-                                {category}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <div>
-                    <label htmlFor={`expense-date-${tripId}`}>
-                        Expense Date
-                    </label>
-                    <input
-                        id={`expense-date-${tripId}`}
-                        type="date"
-                        name="expenseDate"
-                        value={form.expenseDate}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-
-                <div>
-                    <label htmlFor={`expense-notes-${tripId}`}>
-                        Notes (optional)
-                    </label>
-                    <textarea
-                        id={`expense-notes-${tripId}`}
-                        name="notes"
-                        value={form.notes}
-                        onChange={handleChange}
-                        maxLength={1000}
-                        rows={3}
-                    />
-                </div>
-
-                <button type="submit" disabled={saving}>
-                    {saving ? 'Saving Expense...' : 'Add Expense'}
-                </button>
-            </form>
-
-            {error && <p role="alert">{error}</p>}
-
-            <hr />
-
-            <h4>Expense History</h4>
-
-            {expenses.length === 0 ? (
-                <p>No expenses recorded for this trip yet.</p>
+            {loading ? (
+                <p className="expense-loading">
+                    Loading expenses...
+                </p>
             ) : (
-                <div>
-                    {expenses.map((expense) => (
-                        <article
-                            key={expense._id}
-                            style={{
-                                border: '1px solid #ddd',
-                                padding: '12px',
-                                marginBottom: '10px',
-                                borderRadius: '8px',
-                            }}
-                        >
-                            <h5>{expense.title}</h5>
+                <>
+                    <div className="expense-total-card">
+                        <span>TOTAL TRIP SPENDING</span>
+                        <h3>{formatAmount(totalAmount)}</h3>
+                        <p>
+                            {expenseCount}{' '}
+                            {expenseCount === 1
+                                ? 'expense recorded'
+                                : 'expenses recorded'}
+                        </p>
+                    </div>
 
-                            <p>
-                                Amount: {Number(expense.amount).toFixed(2)}
-                            </p>
-
-                            <p>Category: {expense.category}</p>
-
-                            <p>
-                                Date: {expense.expenseDate.slice(0, 10)}
-                            </p>
-
-                            {expense.notes && (
-                                <p>Notes: {expense.notes}</p>
-                            )}
-
-                            {editingId === expense._id ? (
-                                <form onSubmit={handleUpdate}>
-                                    <h5>Edit Expense</h5>
-
-                                    <div>
-                                        <label
-                                            htmlFor={`edit-title-${expense._id}`}
-                                        >
-                                            Expense Title
-                                        </label>
-                                        <input
-                                            id={`edit-title-${expense._id}`}
-                                            type="text"
-                                            name="title"
-                                            value={editForm.title}
-                                            onChange={handleEditChange}
-                                            maxLength={150}
-                                            required
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label
-                                            htmlFor={`edit-amount-${expense._id}`}
-                                        >
-                                            Amount
-                                        </label>
-                                        <input
-                                            id={`edit-amount-${expense._id}`}
-                                            type="number"
-                                            name="amount"
-                                            value={editForm.amount}
-                                            onChange={handleEditChange}
-                                            min="0.01"
-                                            step="0.01"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label
-                                            htmlFor={`edit-category-${expense._id}`}
-                                        >
-                                            Category
-                                        </label>
-                                        <select
-                                            id={`edit-category-${expense._id}`}
-                                            name="category"
-                                            value={editForm.category}
-                                            onChange={handleEditChange}
-                                            required
-                                        >
-                                            {categories.map((category) => (
-                                                <option
-                                                    key={category}
-                                                    value={category}
-                                                >
-                                                    {category}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label
-                                            htmlFor={`edit-date-${expense._id}`}
-                                        >
-                                            Expense Date
-                                        </label>
-                                        <input
-                                            id={`edit-date-${expense._id}`}
-                                            type="date"
-                                            name="expenseDate"
-                                            value={editForm.expenseDate}
-                                            onChange={handleEditChange}
-                                            required
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label
-                                            htmlFor={`edit-notes-${expense._id}`}
-                                        >
-                                            Notes
-                                        </label>
-                                        <textarea
-                                            id={`edit-notes-${expense._id}`}
-                                            name="notes"
-                                            value={editForm.notes}
-                                            onChange={handleEditChange}
-                                            maxLength={1000}
-                                            rows={3}
-                                        />
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        disabled={updating}
-                                    >
-                                        {updating
-                                            ? 'Saving Changes...'
-                                            : 'Save Changes'}
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        onClick={cancelEditing}
-                                        disabled={updating}
-                                    >
-                                        Cancel
-                                    </button>
-                                </form>
-                            ) : (
-                                <div>
-                                    <button
-                                        type="button"
-                                        onClick={() => startEditing(expense)}
-                                    >
-                                        Edit
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleDelete(expense._id)
-                                        }
-                                        disabled={deletingId === expense._id}
-                                    >
-                                        {deletingId === expense._id
-                                            ? 'Deleting...'
-                                            : 'Delete'}
-                                    </button>
+                    <div className="expense-category-section">
+                        <h4>Spending by Category</h4>
+                        <div className="expense-category-grid">
+                            {categoryTotals.map(({ category, total }) => (
+                                <div
+                                    className="expense-category-card"
+                                    key={category}
+                                >
+                                    <span className="expense-category-icon">
+                                        {categoryIcons[category]}
+                                    </span>
+                                    <span className="expense-category-name">
+                                        {category}
+                                    </span>
+                                    <strong>{formatAmount(total)}</strong>
                                 </div>
-                            )}
-                        </article>
-                    ))}
-                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="expense-add-panel">
+                        <h4>➕ Add New Expense</h4>
+                        <p>Record what you spent during your trip.</p>
+
+                        <form onSubmit={handleSubmit}>
+                            <ExpenseFields
+                                values={form}
+                                onChange={handleChange}
+                                prefix={`expense-${tripId}`}
+                            />
+                            <button type="submit" disabled={saving}>
+                                {saving
+                                    ? 'Saving Expense...'
+                                    : '+ Add Expense'}
+                            </button>
+                        </form>
+                    </div>
+
+                    <div className="expense-history-header">
+                        <div>
+                            <h4>Expense History</h4>
+                            <p>Review and manage your recorded expenses.</p>
+                        </div>
+                        <span>{expenseCount} Total</span>
+                    </div>
+
+                    {expenses.length > 0 && (
+                        <div className="expense-toolbar">
+                            <input
+                                type="search"
+                                aria-label="Search expenses"
+                                placeholder="Search expenses..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
+
+                            <select
+                                aria-label="Filter expenses by category"
+                                value={categoryFilter}
+                                onChange={(e) =>
+                                    setCategoryFilter(e.target.value)
+                                }
+                            >
+                                <option value="All">All Categories</option>
+                                {categories.map((category) => (
+                                    <option key={category} value={category}>
+                                        {category}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
+                    {expenses.length === 0 ? (
+                        <div className="expense-empty">
+                            <span>🧾</span>
+                            <h4>No expenses yet</h4>
+                            <p>
+                                Start tracking your trip spending using
+                                the form above.
+                            </p>
+                        </div>
+                    ) : filteredExpenses.length === 0 ? (
+                        <div className="expense-empty">
+                            <h4>No matching expenses</h4>
+                            <p>Try another search or category.</p>
+                        </div>
+                    ) : (
+                        <div className="expense-list">
+                            {filteredExpenses.map((expense) => (
+                                <article
+                                    className="expense-item"
+                                    key={expense._id}
+                                >
+                                    <div className="expense-item-header">
+                                        <div className="expense-item-title">
+                                            <span className="expense-item-icon">
+                                                {categoryIcons[expense.category] || '📌'}
+                                            </span>
+                                            <div>
+                                                <h5>{expense.title}</h5>
+                                                <span>{expense.category}</span>
+                                            </div>
+                                        </div>
+                                        <strong className="expense-item-amount">
+                                            {formatAmount(expense.amount)}
+                                        </strong>
+                                    </div>
+
+                                    <p className="expense-item-date">
+                                        📅 {formatDate(expense.expenseDate)}
+                                    </p>
+
+                                    {expense.notes && (
+                                        <p className="expense-item-notes">
+                                            {expense.notes}
+                                        </p>
+                                    )}
+
+                                    {editingId === expense._id ? (
+                                        <form
+                                            className="expense-edit-form"
+                                            onSubmit={handleUpdate}
+                                        >
+                                            <h5>Edit Expense</h5>
+                                            <ExpenseFields
+                                                values={editForm}
+                                                onChange={handleEditChange}
+                                                prefix={`edit-${expense._id}`}
+                                            />
+
+                                            <div className="expense-actions">
+                                                <button
+                                                    type="submit"
+                                                    disabled={updating}
+                                                >
+                                                    {updating
+                                                        ? 'Saving Changes...'
+                                                        : 'Save Changes'}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="expense-secondary-btn"
+                                                    onClick={cancelEditing}
+                                                    disabled={updating}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </form>
+                                    ) : (
+                                        <div className="expense-actions">
+                                            <button
+                                                type="button"
+                                                className="expense-secondary-btn"
+                                                onClick={() => startEditing(expense)}
+                                            >
+                                                ✏️ Edit
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="expense-danger-btn"
+                                                disabled={deletingId === expense._id}
+                                                onClick={() => handleDelete(expense._id)}
+                                            >
+                                                {deletingId === expense._id
+                                                    ? 'Deleting...'
+                                                    : '🗑️ Delete'}
+                                            </button>
+                                        </div>
+                                    )}
+                                </article>
+                            ))}
+                        </div>
+                    )}
+                </>
             )}
         </section>
     )
