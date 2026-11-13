@@ -2653,3 +2653,480 @@ button:active:not(:disabled) {
     width: 100%;
   }
 }
+
+
+/* ======================================
+   TravelLog - Create Journal Entry UI
+====================================== */
+
+.create-journal {
+  min-width: 0;
+  padding: 8px 0;
+}
+
+.create-journal-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.create-journal-header-icon {
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: #e7f4ed;
+  border-radius: 16px;
+  font-size: 27px;
+}
+
+.create-journal-eyebrow {
+  color: #23836a;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.create-journal-header h3 {
+  font-size: 24px;
+  margin: 5px 0;
+}
+
+.create-journal-header p {
+  color: #71867d;
+  font-size: 13px;
+  margin: 0;
+}
+
+.create-journal-form {
+  background: #ffffff;
+  border: 1px solid #e2ebe6;
+  border-radius: 17px;
+  padding: 25px;
+  min-width: 0;
+}
+
+.create-journal-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.create-journal-section-heading>span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  background: #e7f4ed;
+  border-radius: 11px;
+  font-size: 21px;
+}
+
+.create-journal-section-heading h4 {
+  font-size: 18px;
+  margin: 0 0 5px;
+}
+
+.create-journal-section-heading p {
+  color: #71867d;
+  font-size: 12px;
+  margin: 0;
+}
+
+.create-journal-grid {
+  display: grid;
+  grid-template-columns: repeat(2,
+      minmax(0, 1fr));
+  gap: 18px;
+}
+
+.create-journal-field {
+  min-width: 0;
+}
+
+.create-journal-field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #355b4d;
+  margin-bottom: 8px;
+}
+
+.create-journal-field label span {
+  color: #d34b4b;
+}
+
+.create-journal-field input,
+.create-journal-field textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 12px 13px;
+  background: #ffffff;
+  color: #20352f;
+  border: 1px solid #d7e5db;
+  border-radius: 10px;
+  font: inherit;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.create-journal-field input:focus,
+.create-journal-field textarea:focus {
+  outline: none;
+  border-color: #176b58;
+  box-shadow: 0 0 0 3px rgba(23, 107, 88, 0.12);
+}
+
+.create-journal-field textarea {
+  resize: vertical;
+  line-height: 1.7;
+}
+
+.create-journal-field small {
+  display: block;
+  margin-top: 7px;
+  font-size: 11px;
+  color: #71867d;
+}
+
+.create-journal-field-bottom {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.create-journal-divider {
+  height: 1px;
+  background: #e2ebe6;
+  margin: 27px 0;
+}
+
+.create-journal-error {
+  margin-top: 20px;
+  padding: 12px 14px;
+  background: #fff1f0;
+  color: #b42318;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.create-journal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 25px;
+  padding-top: 22px;
+  border-top: 1px solid #e2ebe6;
+}
+
+.create-journal-footer p {
+  flex: 1;
+  margin: 0;
+  color: #71867d;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.create-journal-footer button {
+  background: #176b58;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 13px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.create-journal-footer button:hover:not(:disabled) {
+  background: #105442;
+}
+
+.create-journal-footer button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .create-journal-header h3 {
+    font-size: 21px;
+  }
+
+  .create-journal-form {
+    padding: 17px;
+  }
+
+  .create-journal-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .create-journal-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .create-journal-footer button {
+    width: 100%;
+  }
+}
+
+
+/* ======================================
+   TravelLog - Edit Journal Entry UI
+====================================== */
+
+.edit-journal {
+  min-width: 0;
+  padding: 8px 0;
+}
+
+.edit-journal-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.edit-journal-header-icon {
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: #e7f4ed;
+  border-radius: 16px;
+  font-size: 27px;
+}
+
+.edit-journal-eyebrow {
+  color: #23836a;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.edit-journal-header h3 {
+  font-size: 24px;
+  margin: 5px 0;
+}
+
+.edit-journal-header p {
+  color: #71867d;
+  font-size: 13px;
+  margin: 0;
+}
+
+.edit-journal-form {
+  background: #ffffff;
+  border: 1px solid #e2ebe6;
+  border-radius: 17px;
+  padding: 25px;
+  min-width: 0;
+}
+
+.edit-journal-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.edit-journal-section-heading>span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  background: #e7f4ed;
+  border-radius: 11px;
+  font-size: 21px;
+}
+
+.edit-journal-section-heading h4 {
+  font-size: 18px;
+  margin: 0 0 5px;
+}
+
+.edit-journal-section-heading p {
+  color: #71867d;
+  font-size: 12px;
+  margin: 0;
+}
+
+.edit-journal-grid {
+  display: grid;
+  grid-template-columns: repeat(2,
+      minmax(0, 1fr));
+  gap: 18px;
+}
+
+.edit-journal-field {
+  min-width: 0;
+}
+
+.edit-journal-field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #355b4d;
+  margin-bottom: 8px;
+}
+
+.edit-journal-field label span {
+  color: #d34b4b;
+}
+
+.edit-journal-field input,
+.edit-journal-field textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 12px 13px;
+  background: #ffffff;
+  color: #20352f;
+  border: 1px solid #d7e5db;
+  border-radius: 10px;
+  font: inherit;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.edit-journal-field input:focus,
+.edit-journal-field textarea:focus {
+  outline: none;
+  border-color: #176b58;
+  box-shadow: 0 0 0 3px rgba(23, 107, 88, 0.12);
+}
+
+.edit-journal-field textarea {
+  resize: vertical;
+  line-height: 1.7;
+}
+
+.edit-journal-field small {
+  display: block;
+  margin-top: 7px;
+  font-size: 11px;
+  color: #71867d;
+}
+
+.edit-journal-field-bottom {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.edit-journal-divider {
+  height: 1px;
+  background: #e2ebe6;
+  margin: 27px 0;
+}
+
+.edit-journal-error {
+  margin-top: 20px;
+  padding: 12px 14px;
+  background: #fff1f0;
+  color: #b42318;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.edit-journal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 25px;
+  padding-top: 22px;
+  border-top: 1px solid #e2ebe6;
+}
+
+.edit-journal-footer>p {
+  flex: 1;
+  margin: 0;
+  color: #71867d;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.edit-journal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.edit-journal-actions button {
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.edit-journal-actions .edit-journal-cancel-btn {
+  background: #edf3ef;
+  color: #355b4d;
+  border: 1px solid #d7e5db;
+}
+
+.edit-journal-actions .edit-journal-cancel-btn:hover:not(:disabled) {
+  background: #dfece3;
+}
+
+.edit-journal-actions .edit-journal-save-btn {
+  background: #176b58;
+  color: white;
+  border: 1px solid #176b58;
+}
+
+.edit-journal-actions .edit-journal-save-btn:hover:not(:disabled) {
+  background: #105442;
+}
+
+.edit-journal-actions button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .edit-journal-header h3 {
+    font-size: 21px;
+  }
+
+  .edit-journal-form {
+    padding: 17px;
+  }
+
+  .edit-journal-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .edit-journal-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .edit-journal-actions {
+    flex-direction: column;
+  }
+
+  .edit-journal-actions button {
+    width: 100%;
+  }
+}
