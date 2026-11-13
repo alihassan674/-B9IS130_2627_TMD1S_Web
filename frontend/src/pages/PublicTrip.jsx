@@ -6,6 +6,7 @@ function PublicTrip({ tripId }) {
     const [entries, setEntries] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
+    const [brokenImages, setBrokenImages] = useState({})
 
     useEffect(() => {
         let active = true
@@ -15,6 +16,7 @@ function PublicTrip({ tripId }) {
             setError('')
             setTrip(null)
             setEntries([])
+            setBrokenImages({})
 
             try {
                 const response = await fetch(
@@ -31,7 +33,16 @@ function PublicTrip({ tripId }) {
 
                 if (active) {
                     setTrip(data.trip)
-                    setEntries(data.entries || [])
+
+                    const sortedEntries = [
+                        ...(data.entries || []),
+                    ].sort(
+                        (a, b) =>
+                            new Date(a.entryDate) -
+                            new Date(b.entryDate)
+                    )
+
+                    setEntries(sortedEntries)
                 }
             } catch (err) {
                 if (active) setError(err.message)
@@ -47,160 +58,238 @@ function PublicTrip({ tripId }) {
         }
     }, [tripId])
 
-
-
     const formatDate = (date) => {
-        if (!date) return ''
-        return date.slice(0, 10)
+        if (!date) return 'Not specified'
+
+        const [year, month, day] =
+            date.slice(0, 10).split('-')
+
+        return new Date(
+            Number(year),
+            Number(month) - 1,
+            Number(day)
+        ).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+        })
     }
+
+    const photoCount = entries.reduce(
+        (total, entry) =>
+            total + (entry.photos?.length || 0),
+        0
+    )
 
     if (loading) {
-        return <p>Loading shared trip...</p>
-    }
-
-    if (error) {
         return (
-            <main>
-                <h2>Trip Unavailable</h2>
-                <p role="alert">{error}</p>
-                <p>
-                    This trip may be private, deleted, or the
-                    shared link may be incorrect.
-                </p>
+            <main className="public-trip-page">
+                <div className="public-trip-message">
+                    <span>🧳</span>
+                    <h2>Loading shared trip...</h2>
+                    <p>Getting the travel memories ready.</p>
+                </div>
             </main>
         )
     }
 
-    if (!trip) {
-        return <p>Trip not found.</p>
+    if (error || !trip) {
+        return (
+            <main className="public-trip-page">
+                <div className="public-trip-message">
+                    <span>🧭</span>
+                    <h2>Trip Unavailable</h2>
+
+                    {error && (
+                        <p role="alert">{error}</p>
+                    )}
+
+                    <p>
+                        This trip may be private, deleted,
+                        or the shared link may be incorrect.
+                    </p>
+
+                    <a href="/">Visit TravelLog</a>
+                </div>
+            </main>
+        )
     }
 
-
     return (
-        <main
-            style={{
-                maxWidth: '900px',
-                margin: '30px auto',
-                padding: '20px',
-            }}
-        >
-            <header>
-                <p>TravelLog — Shared Trip</p>
+        <main className="public-trip-page">
+            <nav
+                className="public-trip-nav"
+                aria-label="Public trip navigation"
+            >
+                <a className="public-trip-brand" href="/">
+                    <span>🌍</span>
+                    TravelLog
+                </a>
+
+                <span className="public-trip-badge">
+                    🌐 Shared Trip
+                </span>
+            </nav>
+
+            <header className="public-trip-hero">
+                <span className="public-trip-eyebrow">
+                    A JOURNEY WORTH SHARING
+                </span>
 
                 <h1>{trip.title}</h1>
 
-                <h3>{trip.destination}</h3>
+                <div className="public-trip-meta">
+                    <span>📍 {trip.destination}</span>
 
-                <p>
-                    {formatDate(trip.startDate)}
-                    {' to '}
-                    {formatDate(trip.endDate)}
-                </p>
+                    <span>
+                        📅 {formatDate(trip.startDate)}
+                        {' — '}
+                        {formatDate(trip.endDate)}
+                    </span>
+                </div>
 
                 {trip.description && (
-                    <p>{trip.description}</p>
+                    <p className="public-trip-description">
+                        {trip.description}
+                    </p>
                 )}
             </header>
 
-            <hr />
+            <section
+                className="public-trip-stats"
+                aria-label="Trip summary"
+            >
+                <div className="public-trip-stat">
+                    <span>📖</span>
+                    <strong>{entries.length}</strong>
+                    <small>Journal Entries</small>
+                </div>
 
-            <section>
-                <h2>Travel Journal</h2>
+                <div className="public-trip-stat">
+                    <span>📸</span>
+                    <strong>{photoCount}</strong>
+                    <small>Travel Photos</small>
+                </div>
+            </section>
+
+            <section className="public-trip-journal">
+                <div className="public-trip-section-heading">
+                    <span className="public-trip-eyebrow">
+                        TRAVEL MEMORIES
+                    </span>
+
+                    <h2>The Journey</h2>
+
+                    <p>
+                        Explore the moments and stories
+                        from this adventure.
+                    </p>
+                </div>
 
                 {entries.length === 0 ? (
-                    <p>
-                        No journal entries have been shared yet.
-                    </p>
+                    <div className="public-trip-empty">
+                        <span>📖</span>
+                        <h3>No journal entries shared yet</h3>
+                        <p>
+                            Travel memories will appear here
+                            when they are added.
+                        </p>
+                    </div>
                 ) : (
-                    <div
-                        style={{
-                            borderLeft: '3px solid #2563eb',
-                            paddingLeft: '20px',
-                            marginLeft: '10px',
-                        }}
-                    >
-                        {entries.map((entry) => (
+                    <div className="public-trip-timeline">
+                        {entries.map((entry, index) => (
                             <article
+                                className="public-trip-entry"
                                 key={entry._id}
-                                style={{
-                                    border: '1px solid #ddd',
-                                    borderRadius: '8px',
-                                    padding: '16px',
-                                    marginBottom: '20px',
-                                }}
                             >
-                                <p>
-                                    <strong>
-                                        {formatDate(entry.entryDate)}
-                                    </strong>
-                                </p>
+                                <div
+                                    className="public-trip-marker"
+                                    aria-hidden="true"
+                                >
+                                    <span>📍</span>
+                                </div>
 
-                                <h3>{entry.title}</h3>
+                                <div className="public-trip-entry-card">
+                                    <div className="public-trip-entry-top">
+                                        <span className="public-trip-date">
+                                            📅 {formatDate(entry.entryDate)}
+                                        </span>
 
-                                <p>{entry.content}</p>
-
-                                {entry.photos?.length > 0 && (
-                                    <div
-                                        style={{
-                                            display: 'grid',
-                                            gridTemplateColumns:
-                                                'repeat(auto-fit, minmax(180px, 1fr))',
-                                            gap: '12px',
-                                            marginTop: '15px',
-                                        }}
-                                    >
-                                        {entry.photos.map((photo) => (
-                                            <figure
-                                                key={photo._id}
-                                                style={{
-                                                    margin: 0,
-                                                    border: '1px solid #ddd',
-                                                    borderRadius: '8px',
-                                                    padding: '8px',
-                                                }}
-                                            >
-                                                <img
-                                                    src={photo.imageUrl}
-                                                    alt={
-                                                        photo.caption ||
-                                                        'Travel memory'
-                                                    }
-                                                    loading="lazy"
-                                                    referrerPolicy="no-referrer"
-                                                    style={{
-                                                        width: '100%',
-                                                        height: '180px',
-                                                        objectFit: 'cover',
-                                                        borderRadius: '6px',
-                                                    }}
-                                                />
-
-                                                {photo.caption && (
-                                                    <figcaption
-                                                        style={{
-                                                            marginTop: '8px',
-                                                        }}
-                                                    >
-                                                        {photo.caption}
-                                                    </figcaption>
-                                                )}
-                                            </figure>
-                                        ))}
+                                        <span className="public-trip-entry-number">
+                                            Memory {index + 1}
+                                        </span>
                                     </div>
-                                )}
+
+                                    <h3>{entry.title}</h3>
+
+                                    <p className="public-trip-entry-content">
+                                        {entry.content}
+                                    </p>
+
+                                    {entry.photos?.length > 0 && (
+                                        <div className="public-trip-photos">
+                                            <h4>
+                                                📸 Travel Photos
+                                                <span>
+                                                    {' '}({entry.photos.length})
+                                                </span>
+                                            </h4>
+
+                                            <div className="public-trip-photo-grid">
+                                                {entry.photos.map((photo) => (
+                                                    <figure
+                                                        className="public-trip-photo"
+                                                        key={photo._id}
+                                                    >
+                                                        {brokenImages[photo._id] ===
+                                                            photo.imageUrl ? (
+                                                            <div className="public-trip-image-fallback">
+                                                                <span>🖼️</span>
+                                                                <small>
+                                                                    Image unavailable
+                                                                </small>
+                                                            </div>
+                                                        ) : (
+                                                            <img
+                                                                src={photo.imageUrl}
+                                                                alt={
+                                                                    photo.caption ||
+                                                                    'Travel memory'
+                                                                }
+                                                                loading="lazy"
+                                                                referrerPolicy="no-referrer"
+                                                                onError={() =>
+                                                                    setBrokenImages((previous) => ({
+                                                                        ...previous,
+                                                                        [photo._id]: photo.imageUrl,
+                                                                    }))
+                                                                }
+                                                            />
+                                                        )}
+
+                                                        {photo.caption && (
+                                                            <figcaption>
+                                                                {photo.caption}
+                                                            </figcaption>
+                                                        )}
+                                                    </figure>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </article>
                         ))}
                     </div>
                 )}
             </section>
 
-            <footer
-                style={{
-                    marginTop: '30px',
-                    textAlign: 'center',
-                }}
-            >
-                <p>Shared using TravelLog</p>
+            <footer className="public-trip-footer">
+                <span>🌍 TravelLog</span>
+                <p>
+                    Every journey has a story worth remembering.
+                </p>
+                <small>Shared using TravelLog</small>
             </footer>
         </main>
     )
