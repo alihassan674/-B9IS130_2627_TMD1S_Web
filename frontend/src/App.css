@@ -3130,3 +3130,737 @@ button:active:not(:disabled) {
     width: 100%;
   }
 }
+
+
+/* ======================================
+   TravelLog - Login UI
+====================================== */
+
+.tl-login-page {
+  min-height: 100vh;
+  background: #f6f8f6;
+  padding: 24px;
+}
+
+.tl-login-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  width: 100%;
+  max-width: 1120px;
+  min-height: 650px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #e2ebe6;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 16px 50px rgba(22, 61, 48, 0.07);
+}
+
+.tl-login-showcase {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px;
+  background: linear-gradient(145deg,
+      #176b58 0%,
+      #105442 60%,
+      #0d4034 100%);
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.tl-login-showcase::after {
+  content: "";
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  right: -130px;
+  bottom: 60px;
+  pointer-events: none;
+}
+
+.tl-login-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+}
+
+.tl-login-brand-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  font-size: 22px;
+}
+
+.tl-login-showcase-content {
+  position: relative;
+  z-index: 1;
+  padding: 45px 0;
+}
+
+.tl-login-tag {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.tl-login-showcase-content h1 {
+  color: #ffffff;
+  font-size: clamp(34px, 4vw, 49px);
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+  margin: 25px 0 20px;
+}
+
+.tl-login-showcase-content>p {
+  max-width: 390px;
+  color: #d7eee3;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.tl-login-features {
+  display: grid;
+  gap: 16px;
+  margin-top: 35px;
+}
+
+.tl-login-features>div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tl-login-features span {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  font-size: 18px;
+}
+
+.tl-login-features p {
+  color: #f0faf5;
+  font-size: 13px;
+  margin: 0;
+}
+
+.tl-login-showcase-footer {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #c0dfd0;
+  font-size: 12px;
+}
+
+.tl-login-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 45px;
+  min-width: 0;
+}
+
+.tl-login-card {
+  width: 100%;
+  max-width: 390px;
+  min-width: 0;
+}
+
+.tl-login-mobile-brand {
+  display: none;
+}
+
+.tl-login-welcome-icon {
+  display: grid;
+  place-items: center;
+  width: 55px;
+  height: 55px;
+  background: #e7f4ed;
+  border-radius: 15px;
+  font-size: 26px;
+  margin-bottom: 22px;
+}
+
+.tl-login-eyebrow {
+  color: #23836a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.tl-login-card h2 {
+  color: #20352f;
+  font-size: 30px;
+  letter-spacing: -0.8px;
+  margin: 10px 0;
+}
+
+.tl-login-subtitle {
+  color: #71867d;
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0 0 30px;
+}
+
+.tl-login-form {
+  display: grid;
+  gap: 20px;
+}
+
+.tl-login-field {
+  min-width: 0;
+}
+
+.tl-login-field label {
+  display: block;
+  color: #355b4d;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 9px;
+}
+
+.tl-login-field input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 14px 15px;
+  background: #ffffff;
+  color: #20352f;
+  border: 1px solid #d7e5db;
+  border-radius: 11px;
+  font: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.tl-login-field input:focus {
+  outline: none;
+  border-color: #176b58;
+  box-shadow: 0 0 0 3px rgba(23, 107, 88, 0.12);
+}
+
+.tl-login-field input::placeholder {
+  color: #a1b0a8;
+}
+
+.tl-login-password-wrap {
+  position: relative;
+}
+
+.tl-login-password-wrap input {
+  padding-right: 75px;
+}
+
+.tl-login-password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #176b58;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.tl-login-error {
+  margin: 0;
+  padding: 12px 14px;
+  background: #fff1f0;
+  color: #b42318;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.tl-login-submit {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 11px;
+  background: #176b58;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tl-login-submit:hover:not(:disabled) {
+  background: #105442;
+}
+
+.tl-login-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.tl-login-bottom {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #e2ebe6;
+  text-align: center;
+}
+
+.tl-login-bottom p {
+  margin: 0;
+  color: #71867d;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.tl-login-bottom span {
+  color: #176b58;
+  font-weight: 700;
+}
+
+.tl-login-security {
+  margin-top: 25px;
+  text-align: center;
+  color: #8a9e93;
+  font-size: 12px;
+}
+
+@media (max-width: 800px) {
+  .tl-login-layout {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+    min-height: auto;
+  }
+
+  .tl-login-showcase {
+    display: none;
+  }
+
+  .tl-login-panel {
+    padding: 40px 30px;
+  }
+
+  .tl-login-mobile-brand {
+    display: block;
+    color: #176b58;
+    font-size: 23px;
+    font-weight: 800;
+    margin-bottom: 35px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tl-login-page {
+    padding: 12px;
+  }
+
+  .tl-login-layout {
+    border-radius: 17px;
+  }
+
+  .tl-login-panel {
+    padding: 30px 20px;
+  }
+
+  .tl-login-card h2 {
+    font-size: 25px;
+  }
+
+  .tl-login-subtitle {
+    font-size: 13px;
+  }
+}
+
+
+
+/* ======================================
+   TravelLog - Register UI
+====================================== */
+
+.tl-register-page {
+  min-height: 100vh;
+  background: #f6f8f6;
+  padding: 24px;
+}
+
+.tl-register-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  width: 100%;
+  max-width: 1120px;
+  min-height: 650px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #e2ebe6;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 16px 50px rgba(22, 61, 48, 0.07);
+}
+
+.tl-register-showcase {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px;
+  background: linear-gradient(145deg,
+      #176b58 0%,
+      #105442 60%,
+      #0d4034 100%);
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.tl-register-showcase::after {
+  content: "";
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  right: -130px;
+  bottom: 60px;
+  pointer-events: none;
+}
+
+.tl-register-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+}
+
+.tl-register-brand-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  font-size: 22px;
+}
+
+.tl-register-showcase-content {
+  position: relative;
+  z-index: 1;
+  padding: 45px 0;
+}
+
+.tl-register-tag {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.tl-register-showcase-content h1 {
+  color: #ffffff;
+  font-size: clamp(34px, 4vw, 49px);
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+  margin: 25px 0 20px;
+}
+
+.tl-register-showcase-content>p {
+  max-width: 390px;
+  color: #d7eee3;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.tl-register-features {
+  display: grid;
+  gap: 16px;
+  margin-top: 35px;
+}
+
+.tl-register-features>div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tl-register-features span {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  font-size: 18px;
+}
+
+.tl-register-features p {
+  color: #f0faf5;
+  font-size: 13px;
+  margin: 0;
+}
+
+.tl-register-showcase-footer {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #c0dfd0;
+  font-size: 12px;
+}
+
+.tl-register-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 45px;
+  min-width: 0;
+}
+
+.tl-register-card {
+  width: 100%;
+  max-width: 390px;
+  min-width: 0;
+}
+
+.tl-register-mobile-brand {
+  display: none;
+}
+
+.tl-register-welcome-icon {
+  display: grid;
+  place-items: center;
+  width: 55px;
+  height: 55px;
+  background: #e7f4ed;
+  border-radius: 15px;
+  font-size: 26px;
+  margin-bottom: 22px;
+}
+
+.tl-register-eyebrow {
+  color: #23836a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.tl-register-card h2 {
+  color: #20352f;
+  font-size: 30px;
+  letter-spacing: -0.8px;
+  margin: 10px 0;
+}
+
+.tl-register-subtitle {
+  color: #71867d;
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0 0 30px;
+}
+
+.tl-register-form {
+  display: grid;
+  gap: 20px;
+}
+
+.tl-register-field {
+  min-width: 0;
+}
+
+.tl-register-field label {
+  display: block;
+  color: #355b4d;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 9px;
+}
+
+.tl-register-field label span {
+  color: #d34b4b;
+}
+
+.tl-register-field input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 14px 15px;
+  background: #ffffff;
+  color: #20352f;
+  border: 1px solid #d7e5db;
+  border-radius: 11px;
+  font: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.tl-register-field input:focus {
+  outline: none;
+  border-color: #176b58;
+  box-shadow: 0 0 0 3px rgba(23, 107, 88, 0.12);
+}
+
+.tl-register-field input::placeholder {
+  color: #a1b0a8;
+}
+
+.tl-register-password-wrap {
+  position: relative;
+}
+
+.tl-register-password-wrap input {
+  padding-right: 75px;
+}
+
+.tl-register-password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #176b58;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.tl-register-password-hint {
+  margin-top: 9px;
+  font-size: 12px;
+  color: #71867d;
+}
+
+.tl-register-password-hint .tl-register-valid {
+  color: #176b58;
+  font-weight: 700;
+}
+
+.tl-register-error {
+  margin: 0;
+  padding: 12px 14px;
+  background: #fff1f0;
+  color: #b42318;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.tl-register-submit {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 11px;
+  background: #176b58;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tl-register-submit:hover:not(:disabled) {
+  background: #105442;
+}
+
+.tl-register-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.tl-register-bottom {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #e2ebe6;
+  text-align: center;
+}
+
+.tl-register-bottom p {
+  margin: 0 0 5px;
+  color: #71867d;
+  font-size: 13px;
+}
+
+.tl-register-login-link {
+  background: transparent;
+  border: none;
+  color: #176b58;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.tl-register-login-link:hover {
+  text-decoration: underline;
+}
+
+.tl-register-security {
+  margin-top: 25px;
+  text-align: center;
+  color: #8a9e93;
+  font-size: 12px;
+}
+
+@media (max-width: 800px) {
+  .tl-register-layout {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+    min-height: auto;
+  }
+
+  .tl-register-showcase {
+    display: none;
+  }
+
+  .tl-register-panel {
+    padding: 40px 30px;
+  }
+
+  .tl-register-mobile-brand {
+    display: block;
+    color: #176b58;
+    font-size: 23px;
+    font-weight: 800;
+    margin-bottom: 35px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tl-register-page {
+    padding: 12px;
+  }
+
+  .tl-register-layout {
+    border-radius: 17px;
+  }
+
+  .tl-register-panel {
+    padding: 30px 20px;
+  }
+
+  .tl-register-card h2 {
+    font-size: 25px;
+  }
+
+  .tl-register-subtitle {
+    font-size: 13px;
+  }
+}
