@@ -186,3 +186,261 @@ button:active:not(:disabled) {
     padding: 25px 20px;
   }
 }
+
+
+
+/* ========================================
+   TravelLog Dashboard
+======================================== */
+
+.dashboard {
+  min-height: 100vh;
+  background: #f6f8f6;
+}
+
+/* Dashboard Navigation */
+
+.dashboard-header {
+  background: #ffffff;
+  border-bottom: 1px solid #e2ebe6;
+  padding: 18px 6%;
+}
+
+.dashboard-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.dashboard-user-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.dashboard-user-name {
+  font-weight: 600;
+  color: #355b4d;
+}
+
+.dashboard-logout {
+  background: #ffffff;
+  color: #176b58;
+  border: 1px solid #c9ded3;
+}
+
+.dashboard-logout:hover {
+  background: #e9f5ef;
+  color: #115440;
+}
+
+/* Main Dashboard */
+
+.dashboard-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 35px 24px;
+}
+
+/* Welcome Hero */
+
+.dashboard-hero {
+  background: linear-gradient(120deg,
+      #176b58,
+      #2e9478);
+  border-radius: 24px;
+  padding: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  color: #ffffff;
+  overflow: hidden;
+}
+
+.dashboard-hero-content {
+  max-width: 650px;
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #d2f3e5;
+  margin-bottom: 15px;
+}
+
+.dashboard-hero h2 {
+  font-size: clamp(28px, 4vw, 43px);
+  color: #ffffff;
+  margin: 0 0 16px;
+}
+
+.dashboard-hero p {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #e2f5ec;
+  margin-bottom: 25px;
+}
+
+.dashboard-hero-link {
+  display: inline-block;
+  background: #ffffff;
+  color: #176b58;
+  padding: 12px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.dashboard-hero-link:hover {
+  background: #e5f4ec;
+}
+
+.dashboard-hero-decoration {
+  font-size: clamp(80px, 13vw, 160px);
+  opacity: 0.85;
+  line-height: 1;
+}
+
+/* Feature Cards */
+
+.dashboard-features {
+  margin-top: 45px;
+}
+
+.dashboard-section-heading {
+  margin-bottom: 22px;
+}
+
+.dashboard-section-heading h2 {
+  font-size: 27px;
+  margin: 0 0 8px;
+}
+
+.dashboard-section-heading p {
+  color: #71867d;
+  margin: 0;
+}
+
+.dashboard-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.dashboard-feature-card {
+  background: #ffffff;
+  border: 1px solid #e2ebe6;
+  border-radius: 18px;
+  padding: 25px 20px;
+  box-shadow: 0 5px 20px rgba(25, 70, 54, 0.04);
+}
+
+.dashboard-feature-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  background: #e7f4ed;
+  border-radius: 14px;
+  font-size: 26px;
+  margin-bottom: 18px;
+}
+
+.dashboard-feature-card h3 {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+
+.dashboard-feature-card p {
+  color: #71867d;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* My Trips Area */
+
+.dashboard-trips-section {
+  margin-top: 50px;
+  scroll-margin-top: 25px;
+}
+
+.dashboard-trips-content {
+  background: #ffffff;
+  border: 1px solid #e2ebe6;
+  border-radius: 20px;
+  padding: 25px;
+  min-width: 0;
+}
+
+/* Footer */
+
+.dashboard-footer {
+  margin-top: 55px;
+  padding: 20px 0;
+  border-top: 1px solid #e2ebe6;
+  text-align: center;
+}
+
+.dashboard-footer p {
+  color: #71867d;
+  font-size: 13px;
+}
+
+/* Responsive Layout */
+
+@media (max-width: 900px) {
+  .dashboard-feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-hero {
+    padding: 35px;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-header {
+    padding: 15px 20px;
+  }
+
+  .dashboard-header-inner {
+    flex-wrap: wrap;
+  }
+
+  .dashboard-user-actions {
+    gap: 10px;
+  }
+
+  .dashboard-user-name {
+    font-size: 13px;
+  }
+
+  .dashboard-main {
+    padding: 20px 15px;
+  }
+
+  .dashboard-hero {
+    padding: 28px 22px;
+  }
+
+  .dashboard-hero-decoration {
+    display: none;
+  }
+
+  .dashboard-feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-trips-content {
+    padding: 15px;
+  }
+}
