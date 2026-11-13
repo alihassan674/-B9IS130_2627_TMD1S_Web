@@ -748,3 +748,227 @@ button:active:not(:disabled) {
     width: 100%;
   }
 }
+
+
+
+/* ======================================
+   TravelLog - Journal Entries
+====================================== */
+
+.journal-section {
+  min-width: 0;
+  padding: 8px 0;
+}
+
+.journal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.journal-header-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 55px;
+  height: 55px;
+  border-radius: 16px;
+  background: #e7f4ed;
+  font-size: 27px;
+}
+
+.journal-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #23836a;
+}
+
+.journal-header h3 {
+  margin: 5px 0;
+  font-size: 24px;
+}
+
+.journal-header p {
+  margin: 0;
+  color: #71867d;
+  font-size: 13px;
+}
+
+.journal-create-panel,
+.journal-edit-panel {
+  background: #f6faf7;
+  border: 1px solid #dceae1;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 25px;
+  min-width: 0;
+}
+
+.journal-list-header {
+  margin: 28px 0 18px;
+}
+
+.journal-list-header h4 {
+  font-size: 21px;
+  margin: 0 0 5px;
+}
+
+.journal-list-header p {
+  color: #71867d;
+  font-size: 13px;
+  margin: 0;
+}
+
+.journal-search {
+  margin-bottom: 20px;
+}
+
+.journal-search input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d7e5db;
+  border-radius: 10px;
+  background: white;
+  color: #20352f;
+}
+
+.journal-entry-list {
+  display: grid;
+  gap: 18px;
+}
+
+.journal-card {
+  background: #ffffff;
+  border: 1px solid #e2ebe6;
+  border-radius: 16px;
+  padding: 22px;
+  min-width: 0;
+  box-shadow: 0 4px 16px rgba(25, 70, 54, 0.04);
+}
+
+.journal-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.journal-date {
+  background: #e7f4ed;
+  color: #176b58;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.journal-entry-number {
+  font-size: 12px;
+  color: #71867d;
+}
+
+.journal-card h4 {
+  font-size: 20px;
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+}
+
+.journal-content {
+  color: #52675d;
+  line-height: 1.8;
+  font-size: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.journal-photos {
+  border-top: 1px solid #e2ebe6;
+  margin-top: 20px;
+  padding-top: 18px;
+  min-width: 0;
+}
+
+.journal-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-top: 1px solid #e2ebe6;
+  padding-top: 18px;
+  margin-top: 20px;
+}
+
+.journal-card-actions button {
+  font-size: 13px;
+}
+
+.journal-edit-btn {
+  background: #e7f4ed;
+  color: #176b58;
+  border-color: #d2e7d9;
+}
+
+.journal-edit-btn:hover:not(:disabled) {
+  background: #d6ebde;
+}
+
+.journal-delete-btn {
+  background: #fff1f0;
+  color: #b42318;
+  border-color: #f5d1cd;
+}
+
+.journal-delete-btn:hover:not(:disabled) {
+  background: #ffe1dd;
+}
+
+.journal-empty {
+  padding: 35px 20px;
+  border: 1px dashed #cbded2;
+  border-radius: 14px;
+  text-align: center;
+  background: #f7faf8;
+}
+
+.journal-empty span {
+  font-size: 36px;
+}
+
+.journal-empty h4 {
+  margin-bottom: 8px;
+}
+
+.journal-empty p,
+.journal-loading {
+  color: #71867d;
+}
+
+.journal-error {
+  padding: 12px;
+  background: #fff1f0;
+  color: #b42318;
+  border-radius: 10px;
+}
+
+@media (max-width: 600px) {
+  .journal-header h3 {
+    font-size: 21px;
+  }
+
+  .journal-create-panel,
+  .journal-edit-panel,
+  .journal-card {
+    padding: 15px;
+  }
+
+  .journal-card-actions {
+    flex-direction: column;
+  }
+
+  .journal-card-actions button {
+    width: 100%;
+  }
+}
