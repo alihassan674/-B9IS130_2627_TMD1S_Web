@@ -8,12 +8,12 @@ function PhotoGallery({ entryId }) {
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState('')
-
     const [editingId, setEditingId] = useState(null)
     const [editUrl, setEditUrl] = useState('')
     const [editCaption, setEditCaption] = useState('')
     const [updating, setUpdating] = useState(false)
     const [deletingId, setDeletingId] = useState(null)
+    const [brokenImages, setBrokenImages] = useState({})
 
     useEffect(() => {
         let active = true
@@ -22,10 +22,10 @@ function PhotoGallery({ entryId }) {
             setLoading(true)
             setError('')
             setPhotos([])
+            setEditingId(null)
 
             try {
                 const token = sessionStorage.getItem('token')
-
                 const response = await fetch(
                     `/api/journals/${entryId}/photos`,
                     {
@@ -38,14 +38,10 @@ function PhotoGallery({ entryId }) {
                 const data = await response.json()
 
                 if (!response.ok) {
-                    throw new Error(
-                        data.message || 'Failed to load photos'
-                    )
+                    throw new Error(data.message || 'Failed to load photos')
                 }
 
-                if (active) {
-                    setPhotos(data.photos)
-                }
+                if (active) setPhotos(data.photos)
             } catch (err) {
                 if (active) setError(err.message)
             } finally {
@@ -67,7 +63,6 @@ function PhotoGallery({ entryId }) {
 
         try {
             const token = sessionStorage.getItem('token')
-
             const response = await fetch(
                 `/api/journals/${entryId}/photos`,
                 {
@@ -83,9 +78,7 @@ function PhotoGallery({ entryId }) {
             const data = await response.json()
 
             if (!response.ok) {
-                throw new Error(
-                    data.message || 'Failed to add photo'
-                )
+                throw new Error(data.message || 'Failed to add photo')
             }
 
             setPhotos((previous) => [...previous, data.photo])
@@ -118,7 +111,6 @@ function PhotoGallery({ entryId }) {
 
         try {
             const token = sessionStorage.getItem('token')
-
             const response = await fetch(
                 `/api/journals/${entryId}/photos/${editingId}`,
                 {
@@ -137,9 +129,7 @@ function PhotoGallery({ entryId }) {
             const data = await response.json()
 
             if (!response.ok) {
-                throw new Error(
-                    data.message || 'Failed to update photo'
-                )
+                throw new Error(data.message || 'Failed to update photo')
             }
 
             setPhotos((previous) =>
@@ -149,6 +139,12 @@ function PhotoGallery({ entryId }) {
                         : photo
                 )
             )
+
+            setBrokenImages((previous) => {
+                const next = { ...previous }
+                delete next[data.photo._id]
+                return next
+            })
 
             cancelEditing()
         } catch (err) {
@@ -170,7 +166,6 @@ function PhotoGallery({ entryId }) {
 
         try {
             const token = sessionStorage.getItem('token')
-
             const response = await fetch(
                 `/api/journals/${entryId}/photos/${photoId}`,
                 {
@@ -184,18 +179,14 @@ function PhotoGallery({ entryId }) {
             const data = await response.json()
 
             if (!response.ok) {
-                throw new Error(
-                    data.message || 'Failed to delete photo'
-                )
+                throw new Error(data.message || 'Failed to delete photo')
             }
 
             setPhotos((previous) =>
                 previous.filter((photo) => photo._id !== photoId)
             )
 
-            if (editingId === photoId) {
-                cancelEditing()
-            }
+            if (editingId === photoId) cancelEditing()
         } catch (err) {
             setError(err.message)
         } finally {
@@ -204,11 +195,25 @@ function PhotoGallery({ entryId }) {
     }
 
     return (
-        <section>
-            <h5>Travel Photos</h5>
-
-            <form onSubmit={handleSubmit}>
+        <section className="photo-gallery">
+            <div className="photo-gallery-header">
                 <div>
+                    <h5>📸 Travel Photos</h5>
+                    <p>Save the moments that made your trip special.</p>
+                </div>
+
+                <span className="photo-gallery-count">
+                    {photos.length} {photos.length === 1 ? 'Photo' : 'Photos'}
+                </span>
+            </div>
+
+            <form
+                className="photo-add-form"
+                onSubmit={handleSubmit}
+            >
+                <h6>Add a New Photo</h6>
+
+                <div className="photo-form-field">
                     <label htmlFor={`photo-url-${entryId}`}>
                         Photo URL
                     </label>
@@ -223,7 +228,7 @@ function PhotoGallery({ entryId }) {
                     />
                 </div>
 
-                <div>
+                <div className="photo-form-field">
                     <label htmlFor={`photo-caption-${entryId}`}>
                         Caption (optional)
                     </label>
@@ -232,137 +237,134 @@ function PhotoGallery({ entryId }) {
                         type="text"
                         value={caption}
                         onChange={(e) => setCaption(e.target.value)}
+                        placeholder="Describe this beautiful moment..."
                         maxLength={300}
                     />
                 </div>
 
                 <button type="submit" disabled={saving}>
-                    {saving ? 'Adding Photo...' : 'Add Photo'}
+                    {saving ? 'Adding Photo...' : '+ Add Photo'}
                 </button>
             </form>
 
-            {error && <p role="alert">{error}</p>}
+            {error && (
+                <p className="photo-gallery-error" role="alert">
+                    {error}
+                </p>
+            )}
 
             {loading ? (
-                <p>Loading photos...</p>
+                <p className="photo-gallery-loading">
+                    Loading photos...
+                </p>
             ) : photos.length === 0 ? (
-                <p>No photos added yet.</p>
+                <div className="photo-gallery-empty">
+                    <span>📷</span>
+                    <h6>No photos added yet</h6>
+                    <p>Add your first travel memory using a photo URL.</p>
+                </div>
             ) : (
-                <div
-                    style={{
-                        display: 'grid',
-                        gridTemplateColumns:
-                            'repeat(auto-fit, minmax(180px, 1fr))',
-                        gap: '12px',
-                        marginTop: '15px',
-                    }}
-                >
+                <div className="photo-gallery-grid">
                     {photos.map((photo) => (
                         <figure
+                            className="photo-gallery-card"
                             key={photo._id}
-                            style={{
-                                margin: 0,
-                                padding: '8px',
-                                border: '1px solid #ddd',
-                                borderRadius: '8px',
-                            }}
                         >
-                            <img
-                                src={photo.imageUrl}
-                                alt={photo.caption || 'Travel photo'}
-                                loading="lazy"
-                                referrerPolicy="no-referrer"
-                                style={{
-                                    width: '100%',
-                                    height: '160px',
-                                    objectFit: 'cover',
-                                    borderRadius: '6px',
-                                }}
-                            />
-
-                            {photo.caption && (
-                                <figcaption style={{ marginTop: '8px' }}>
-                                    {photo.caption}
-                                </figcaption>
-                            )}
-
-                            {editingId === photo._id ? (
-                                <form
-                                    onSubmit={handleUpdate}
-                                    style={{ marginTop: '10px' }}
-                                >
-                                    <div>
-                                        <label htmlFor={`edit-url-${photo._id}`}>
-                                            Edit Photo URL
-                                        </label>
-                                        <input
-                                            id={`edit-url-${photo._id}`}
-                                            type="url"
-                                            value={editUrl}
-                                            onChange={(e) =>
-                                                setEditUrl(e.target.value)
-                                            }
-                                            maxLength={2000}
-                                            required
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label
-                                            htmlFor={`edit-caption-${photo._id}`}
-                                        >
-                                            Edit Caption
-                                        </label>
-                                        <input
-                                            id={`edit-caption-${photo._id}`}
-                                            type="text"
-                                            value={editCaption}
-                                            onChange={(e) =>
-                                                setEditCaption(e.target.value)
-                                            }
-                                            maxLength={300}
-                                        />
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        disabled={updating}
-                                    >
-                                        {updating
-                                            ? 'Saving...'
-                                            : 'Save Changes'}
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        onClick={cancelEditing}
-                                        disabled={updating}
-                                    >
-                                        Cancel
-                                    </button>
-                                </form>
-                            ) : (
-                                <div style={{ marginTop: '10px' }}>
-                                    <button
-                                        type="button"
-                                        onClick={() => startEditing(photo)}
-                                    >
-                                        Edit
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleDelete(photo._id)
-                                        }
-                                        disabled={deletingId === photo._id}
-                                    >
-                                        {deletingId === photo._id
-                                            ? 'Deleting...'
-                                            : 'Delete'}
-                                    </button>
+                            {brokenImages[photo._id] === photo.imageUrl ? (
+                                <div className="photo-image-fallback">
+                                    <span>🖼️</span>
+                                    <p>Image unavailable</p>
                                 </div>
+                            ) : (
+                                <img
+                                    src={photo.imageUrl}
+                                    alt={photo.caption || 'Travel photo'}
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer"
+                                    onError={() =>
+                                        setBrokenImages((previous) => ({
+                                            ...previous,
+                                            [photo._id]: photo.imageUrl,
+                                        }))
+                                    }
+                                />
                             )}
+
+                            <div className="photo-gallery-card-body">
+                                {photo.caption && (
+                                    <figcaption>{photo.caption}</figcaption>
+                                )}
+
+                                {editingId === photo._id ? (
+                                    <form
+                                        className="photo-edit-form"
+                                        onSubmit={handleUpdate}
+                                    >
+                                        <div className="photo-form-field">
+                                            <label htmlFor={`edit-url-${photo._id}`}>
+                                                Edit Photo URL
+                                            </label>
+                                            <input
+                                                id={`edit-url-${photo._id}`}
+                                                type="url"
+                                                value={editUrl}
+                                                onChange={(e) => setEditUrl(e.target.value)}
+                                                maxLength={2000}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="photo-form-field">
+                                            <label htmlFor={`edit-caption-${photo._id}`}>
+                                                Edit Caption
+                                            </label>
+                                            <input
+                                                id={`edit-caption-${photo._id}`}
+                                                type="text"
+                                                value={editCaption}
+                                                onChange={(e) => setEditCaption(e.target.value)}
+                                                maxLength={300}
+                                            />
+                                        </div>
+
+                                        <div className="photo-gallery-actions">
+                                            <button type="submit" disabled={updating}>
+                                                {updating ? 'Saving...' : 'Save Changes'}
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                className="photo-btn-secondary"
+                                                onClick={cancelEditing}
+                                                disabled={updating}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                ) : (
+                                    <div className="photo-gallery-actions">
+                                        <button
+                                            type="button"
+                                            className="photo-btn-secondary"
+                                            onClick={() => startEditing(photo)}
+                                        >
+                                            ✏️ Edit
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="photo-btn-danger"
+                                            onClick={() => handleDelete(photo._id)}
+                                            disabled={deletingId === photo._id}
+                                        >
+                                            {deletingId === photo._id
+                                                ? 'Deleting...'
+                                                : '🗑️ Delete'}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </figure>
                     ))}
                 </div>
