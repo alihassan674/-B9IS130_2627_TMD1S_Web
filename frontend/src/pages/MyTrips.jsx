@@ -12,11 +12,16 @@ function MyTrips() {
     const [error, setError] = useState('')
     const [editingTrip, setEditingTrip] = useState(null)
     const [deletingId, setDeletingId] = useState(null)
+    const [sharingId, setSharingId] = useState(null)
     const [selectedJournalTripId, setSelectedJournalTripId] = useState(null)
     const [selectedExpenseTripId, setSelectedExpenseTripId] = useState(null)
     const [selectedTimelineTripId, setSelectedTimelineTripId] = useState(null)
+    const [search, setSearch] = useState('')
+    const [filter, setFilter] = useState('all')
 
     useEffect(() => {
+        let active = true
+
         const fetchTrips = async () => {
             try {
                 const token = sessionStorage.getItem('token')
@@ -33,15 +38,19 @@ function MyTrips() {
                     throw new Error(data.message || 'Failed to load trips')
                 }
 
-                setTrips(data.trips)
+                if (active) setTrips(data.trips)
             } catch (err) {
-                setError(err.message)
+                if (active) setError(err.message)
             } finally {
-                setLoading(false)
+                if (active) setLoading(false)
             }
         }
 
         fetchTrips()
+
+        return () => {
+            active = false
+        }
     }, [])
 
     const handleTripCreated = (newTrip) => {
@@ -57,30 +66,24 @@ function MyTrips() {
                 trip._id === updatedTrip._id ? updatedTrip : trip
             )
         )
-
         setEditingTrip(null)
     }
 
-
     const handleTogglePublic = async (trip) => {
         const newStatus = !trip.isPublic
+        setSharingId(trip._id)
 
         try {
             const token = sessionStorage.getItem('token')
 
-            const response = await fetch(
-                `/api/trips/${trip._id}`,
-                {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                        isPublic: newStatus,
-                    }),
-                }
-            )
+            const response = await fetch(`/api/trips/${trip._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ isPublic: newStatus }),
+            })
 
             const data = await response.json()
 
@@ -90,7 +93,6 @@ function MyTrips() {
                 )
             }
 
-            // Update the trip immediately in React
             setTrips((previousTrips) =>
                 previousTrips.map((existingTrip) =>
                     existingTrip._id === trip._id
@@ -99,11 +101,15 @@ function MyTrips() {
                 )
             )
 
-        } catch (error) {
-            alert(error.message)
+            if (editingTrip?._id === trip._id) {
+                setEditingTrip(data.trip)
+            }
+        } catch (err) {
+            alert(err.message)
+        } finally {
+            setSharingId(null)
         }
     }
-
 
     const handleCopyShareLink = async (tripId) => {
         const shareUrl =
@@ -111,19 +117,15 @@ function MyTrips() {
 
         try {
             await navigator.clipboard.writeText(shareUrl)
-
             alert('Share link copied successfully!')
-        } catch (error) {
-            alert(
-                `Unable to copy automatically. Share this link: ${shareUrl}`
-            )
+        } catch {
+            window.prompt('Copy this share link:', shareUrl)
         }
     }
 
-
     const handleDelete = async (tripId) => {
         const confirmed = window.confirm(
-            'Are you sure you want to delete this trip?'
+            'Delete this trip and all its journals, photos, and expenses? This cannot be undone.'
         )
 
         if (!confirmed) return
@@ -151,22 +153,10 @@ function MyTrips() {
                 previousTrips.filter((trip) => trip._id !== tripId)
             )
 
-            if (editingTrip?._id === tripId) {
-                setEditingTrip(null)
-            }
-
-            if (selectedJournalTripId === tripId) {
-                setSelectedJournalTripId(null)
-            }
-
-            if (selectedExpenseTripId === tripId) {
-                setSelectedExpenseTripId(null)
-            }
-
-            if (selectedTimelineTripId === tripId) {
-                setSelectedTimelineTripId(null)
-            }
-
+            if (editingTrip?._id === tripId) setEditingTrip(null)
+            if (selectedJournalTripId === tripId) setSelectedJournalTripId(null)
+            if (selectedExpenseTripId === tripId) setSelectedExpenseTripId(null)
+            if (selectedTimelineTripId === tripId) setSelectedTimelineTripId(null)
         } catch (err) {
             setError(err.message)
         } finally {
@@ -174,174 +164,279 @@ function MyTrips() {
         }
     }
 
-    if (loading) {
-        return <p>Loading trips...</p>
-    }
+    const formatDate = (date) =>
+        date ? date.slice(0, 10) : 'Not specified'
+
+    const filteredTrips = trips.filter((trip) => {
+        const query = search.trim().toLowerCase()
+
+        const matchesSearch =
+            trip.title.toLowerCase().includes(query) ||
+            trip.destination.toLowerCase().includes(query)
+
+        const matchesFilter =
+            filter === 'all' ||
+            (filter === 'public' && trip.isPublic) ||
+            (filter === 'private' && !trip.isPublic)
+
+        return matchesSearch && matchesFilter
+    })
+
+    const publicCount = trips.filter((trip) => trip.isPublic).length
 
     return (
-        <section>
-            <CreateTrip onTripCreated={handleTripCreated} />
+        <section className="mytrips">
+            <div className="mytrips-create">
+                <CreateTrip onTripCreated={handleTripCreated} />
+            </div>
 
-            <hr />
+            <div className="mytrips-heading">
+                <div>
+                    <span className="mytrips-eyebrow">YOUR ADVENTURES</span>
+                    <h3>My Trips</h3>
+                    <p>Explore, organize, and share your travel memories.</p>
+                </div>
 
-            <h3>My Trips</h3>
+                <span className="mytrips-count">
+                    {trips.length} {trips.length === 1 ? 'Trip' : 'Trips'}
+                </span>
+            </div>
 
-            {error && <p role="alert">{error}</p>}
-
-            {editingTrip && (
-                <EditTrip
-                    key={editingTrip._id}
-                    trip={editingTrip}
-                    onTripUpdated={handleTripUpdated}
-                    onCancel={() => setEditingTrip(null)}
-                />
+            {error && (
+                <p className="mytrips-error" role="alert">
+                    {error}
+                </p>
             )}
 
-            {trips.length === 0 ? (
-                <p>No trips yet. Create your first travel adventure!</p>
-            ) : (
-                <div>
-                    {trips.map((trip) => (
-                        <div
-                            key={trip._id}
-                            style={{
-                                border: '1px solid #ccc',
-                                padding: '15px',
-                                marginBottom: '12px',
-                                borderRadius: '8px',
-                            }}
-                        >
-                            <h4>{trip.title}</h4>
-
-                            <p>Destination: {trip.destination}</p>
-
-                            <p>
-                                Start Date:{' '}
-                                {new Date(trip.startDate).toLocaleDateString()}
-                            </p>
-
-                            <p>
-                                End Date:{' '}
-                                {new Date(trip.endDate).toLocaleDateString()}
-                            </p>
-
-                            {trip.description && (
-                                <p>Description: {trip.description}</p>
-                            )}
-
-                            <p>
-                                Status: {trip.isPublic ? 'Public' : 'Private'}
-                            </p>
-
-                            <button
-                                type="button"
-                                onClick={() => setEditingTrip(trip)}
-                            >
-                                Edit
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => handleDelete(trip._id)}
-                                disabled={deletingId === trip._id}
-                            >
-                                {deletingId === trip._id
-                                    ? 'Deleting...'
-                                    : 'Delete'}
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setSelectedJournalTripId(
-                                        selectedJournalTripId === trip._id
-                                            ? null
-                                            : trip._id
-                                    )
-                                }
-                            >
-                                {selectedJournalTripId === trip._id
-                                    ? 'Hide Journal'
-                                    : 'View Journal'}
-                            </button>
-
-                            {selectedJournalTripId === trip._id && (
-                                <JournalEntries tripId={trip._id} />
-                            )}
-
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setSelectedExpenseTripId(
-                                        selectedExpenseTripId === trip._id
-                                            ? null
-                                            : trip._id
-                                    )
-                                }
-                            >
-                                {selectedExpenseTripId === trip._id
-                                    ? 'Hide Expenses'
-                                    : 'View Expenses'}
-                            </button>
-
-                            {selectedExpenseTripId === trip._id && (
-                                <TripExpenses tripId={trip._id} />
-                            )}
-
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setSelectedTimelineTripId(
-                                        selectedTimelineTripId === trip._id
-                                            ? null
-                                            : trip._id
-                                    )
-                                }
-                            >
-                                {selectedTimelineTripId === trip._id
-                                    ? 'Hide Timeline'
-                                    : 'View Timeline'}
-                            </button>
-
-                            {selectedTimelineTripId === trip._id && (
-                                <TripTimeline tripId={trip._id} />
-                            )}
-
-
-                            <div
-                                style={{
-                                    marginTop: '12px',
-                                    display: 'flex',
-                                    gap: '10px',
-                                    flexWrap: 'wrap',
-                                }}
-                            >
-                                <button
-                                    type="button"
-                                    onClick={() => handleTogglePublic(trip)}
-                                >
-                                    {trip.isPublic ? 'Make Private' : 'Make Public'}
-                                </button>
-
-                                {trip.isPublic && (
-                                    <button
-                                        type="button"
-                                        onClick={() => handleCopyShareLink(trip._id)}
-                                    >
-                                        Copy Share Link
-                                    </button>
-                                )}
-
-                                <p style={{ width: '100%', margin: 0 }}>
-                                    <strong>Sharing Status: </strong>
-                                    {trip.isPublic ? 'Public' : 'Private'}
-                                </p>
-                            </div>
-
-
-                        </div>
-                    ))}
+            {editingTrip && (
+                <div className="mytrips-edit-panel">
+                    <EditTrip
+                        key={editingTrip._id}
+                        trip={editingTrip}
+                        onTripUpdated={handleTripUpdated}
+                        onCancel={() => setEditingTrip(null)}
+                    />
                 </div>
+            )}
+
+            {loading ? (
+                <p>Loading trips...</p>
+            ) : (
+                <>
+                    <div className="mytrips-summary">
+                        <div className="mytrips-stat">
+                            <span>All Trips</span>
+                            <strong>{trips.length}</strong>
+                        </div>
+
+                        <div className="mytrips-stat">
+                            <span>Public Trips</span>
+                            <strong>{publicCount}</strong>
+                        </div>
+
+                        <div className="mytrips-stat">
+                            <span>Private Trips</span>
+                            <strong>{trips.length - publicCount}</strong>
+                        </div>
+                    </div>
+
+                    <div className="mytrips-toolbar">
+                        <input
+                            type="search"
+                            aria-label="Search trips"
+                            placeholder="Search by title or destination..."
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
+                        />
+
+                        <select
+                            aria-label="Filter trips by sharing status"
+                            value={filter}
+                            onChange={(event) => setFilter(event.target.value)}
+                        >
+                            <option value="all">All Trips</option>
+                            <option value="public">Public Trips</option>
+                            <option value="private">Private Trips</option>
+                        </select>
+                    </div>
+
+                    {trips.length === 0 ? (
+                        <div className="mytrips-empty">
+                            <span>🌍</span>
+                            <h4>Your adventure starts here</h4>
+                            <p>Create your first trip using the form above.</p>
+                        </div>
+                    ) : filteredTrips.length === 0 ? (
+                        <div className="mytrips-empty">
+                            <h4>No matching trips</h4>
+                            <p>Try a different search or filter.</p>
+                        </div>
+                    ) : (
+                        <div className="mytrips-grid">
+                            {filteredTrips.map((trip) => (
+                                <article className="mytrips-card" key={trip._id}>
+                                    <div className="mytrips-card-top">
+                                        <span className="mytrips-card-icon">✈️</span>
+
+                                        <span
+                                            className={
+                                                trip.isPublic
+                                                    ? 'mytrips-status public'
+                                                    : 'mytrips-status private'
+                                            }
+                                        >
+                                            {trip.isPublic ? '🌐 Public' : '🔒 Private'}
+                                        </span>
+                                    </div>
+
+                                    <h4>{trip.title}</h4>
+
+                                    <p className="mytrips-destination">
+                                        📍 {trip.destination}
+                                    </p>
+
+                                    <p className="mytrips-dates">
+                                        📅 {formatDate(trip.startDate)}
+                                        {' — '}
+                                        {formatDate(trip.endDate)}
+                                    </p>
+
+                                    {trip.description && (
+                                        <p className="mytrips-description">
+                                            {trip.description}
+                                        </p>
+                                    )}
+
+                                    <div className="mytrips-actions">
+                                        <button
+                                            type="button"
+                                            className="mytrips-btn-secondary"
+                                            onClick={() => setEditingTrip(trip)}
+                                        >
+                                            Edit Trip
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="mytrips-btn-danger"
+                                            disabled={deletingId === trip._id}
+                                            onClick={() => handleDelete(trip._id)}
+                                        >
+                                            {deletingId === trip._id
+                                                ? 'Deleting...'
+                                                : 'Delete'}
+                                        </button>
+                                    </div>
+
+                                    <div className="mytrips-section-label">
+                                        Explore your trip
+                                    </div>
+
+                                    <div className="mytrips-actions">
+                                        <button
+                                            type="button"
+                                            className="mytrips-btn-secondary"
+                                            aria-expanded={selectedJournalTripId === trip._id}
+                                            onClick={() =>
+                                                setSelectedJournalTripId(
+                                                    selectedJournalTripId === trip._id
+                                                        ? null
+                                                        : trip._id
+                                                )
+                                            }
+                                        >
+                                            {selectedJournalTripId === trip._id
+                                                ? 'Hide Journal'
+                                                : '📖 Journal'}
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="mytrips-btn-secondary"
+                                            aria-expanded={selectedExpenseTripId === trip._id}
+                                            onClick={() =>
+                                                setSelectedExpenseTripId(
+                                                    selectedExpenseTripId === trip._id
+                                                        ? null
+                                                        : trip._id
+                                                )
+                                            }
+                                        >
+                                            {selectedExpenseTripId === trip._id
+                                                ? 'Hide Expenses'
+                                                : '💳 Expenses'}
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="mytrips-btn-secondary"
+                                            aria-expanded={selectedTimelineTripId === trip._id}
+                                            onClick={() =>
+                                                setSelectedTimelineTripId(
+                                                    selectedTimelineTripId === trip._id
+                                                        ? null
+                                                        : trip._id
+                                                )
+                                            }
+                                        >
+                                            {selectedTimelineTripId === trip._id
+                                                ? 'Hide Timeline'
+                                                : '🕒 Timeline'}
+                                        </button>
+                                    </div>
+
+                                    <div className="mytrips-sharing">
+                                        <div className="mytrips-section-label">
+                                            Sharing & Privacy
+                                        </div>
+
+                                        <div className="mytrips-actions">
+                                            <button
+                                                type="button"
+                                                disabled={sharingId === trip._id}
+                                                onClick={() => handleTogglePublic(trip)}
+                                            >
+                                                {sharingId === trip._id
+                                                    ? 'Updating...'
+                                                    : trip.isPublic
+                                                        ? 'Make Private'
+                                                        : 'Make Public'}
+                                            </button>
+
+                                            {trip.isPublic && (
+                                                <button
+                                                    type="button"
+                                                    className="mytrips-btn-secondary"
+                                                    onClick={() => handleCopyShareLink(trip._id)}
+                                                >
+                                                    🔗 Copy Share Link
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {selectedJournalTripId === trip._id && (
+                                        <div className="mytrips-expanded">
+                                            <JournalEntries tripId={trip._id} />
+                                        </div>
+                                    )}
+
+                                    {selectedExpenseTripId === trip._id && (
+                                        <div className="mytrips-expanded">
+                                            <TripExpenses tripId={trip._id} />
+                                        </div>
+                                    )}
+
+                                    {selectedTimelineTripId === trip._id && (
+                                        <div className="mytrips-expanded">
+                                            <TripTimeline tripId={trip._id} />
+                                        </div>
+                                    )}
+                                </article>
+                            ))}
+                        </div>
+                    )}
+                </>
             )}
         </section>
     )
