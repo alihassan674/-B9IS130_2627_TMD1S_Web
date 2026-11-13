@@ -3433,6 +3433,21 @@ button:active:not(:disabled) {
   font-weight: 700;
 }
 
+.tl-login-register-link {
+  background: transparent;
+  border: none;
+  color: #176b58;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px;
+  text-decoration: underline;
+}
+
+.tl-login-register-link:hover {
+  color: #105442;
+}
+
 .tl-login-security {
   margin-top: 25px;
   text-align: center;

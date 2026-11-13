@@ -108,52 +108,20 @@ function App() {
   }
 
   // Login and Register pages
+  if (page === 'login') {
+    return (
+      <Login
+        onAuthSuccess={handleAuthSuccess}
+        onRegisterClick={() => setPage('register')}
+      />
+    )
+  }
+
   return (
-    <div className="app-shell">
-      <header className="app-header">
-        <div className="app-header-inner">
-          <div className="app-brand">
-            <div className="app-brand-icon">
-              ✈
-            </div>
-
-            <div>
-              <h1>TravelLog</h1>
-              <p>
-                Your journeys, beautifully remembered
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="auth-layout">
-        <div className="auth-card">
-          {page === 'login' ? (
-            <>
-              <Login
-                onAuthSuccess={handleAuthSuccess}
-              />
-
-              <p className="auth-switch">
-                Don't have an account?{' '}
-                <button
-                  type="button"
-                  onClick={() => setPage('register')}
-                >
-                  Register here
-                </button>
-              </p>
-            </>
-          ) : (
-            <Register
-              onLoginClick={() => setPage('login')}
-              onAuthSuccess={handleAuthSuccess}
-            />
-          )}
-        </div>
-      </main>
-    </div>
+    <Register
+      onLoginClick={() => setPage('login')}
+      onAuthSuccess={handleAuthSuccess}
+    />
   )
 }
 
