@@ -2,11 +2,35 @@
 
 > Trip journal with places, photos, notes, and budgets.
 
-A full-stack **MERN** web application where users can create trips, write dated journal entries, upload photos, record expenses, view a chronological timeline, and share a curated trip page with others.
+A full-stack **MERN** web application where users can create trips, write dated journal entries, attach photos using external image URLs, record expenses, view a chronological timeline, and share a curated trip page with others.
 
 **Module:** B9IS130 – Web Development for Information Systems | CA1 — Dublin Business School, 2026
 
 ---
+
+## Features and objectives
+
+TravelLog centralizes travel memories and spending in one application. Authenticated owners can create, view, edit and delete trips, dated journal entries, photo links and expenses; review a chronological timeline and expense totals; and enable or revoke a public read-only share link. Public visitors cannot access private expenses or modify records. Trips are private by default.
+
+Non-functional objectives include responsive layouts, maintainable components, input validation, access control and reproducible installation. The project is a coursework MVP, not a booking or accounting service.
+
+## Architecture and data model
+
+```mermaid
+flowchart LR
+    A[React browser UI] -->|REST JSON / JWT| B[Express API]
+    B --> C[Mongoose models]
+    C --> D[(MongoDB Atlas)]
+```
+
+| Parent | Child | Relationship |
+| --- | --- | --- |
+| User | Trip | One-to-many via user |
+| Trip | JournalEntry | One-to-many via trip |
+| JournalEntry | Photo | One-to-many via journalEntry |
+| Trip | Expense | One-to-many via trip |
+
+MongoDB ObjectId references represent relationships. Transactional cascade deletion removes dependent records when a trip or journal is deleted. An Atlas replica-set deployment supports these transactions.
 
 ## Tech Stack
 
@@ -79,7 +103,7 @@ TravelLog/
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) v18 or higher
+- [Node.js](https://nodejs.org/) v24 recommended (tested with v24.17.0)
 - [npm](https://www.npmjs.com/) v9 or higher
 - A [MongoDB Atlas](https://www.mongodb.com/atlas) free account with a cluster
 
@@ -90,7 +114,7 @@ TravelLog/
 ### 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
+git clone <your-repo-url> TravelLog
 cd TravelLog
 ```
 
@@ -118,6 +142,9 @@ Open `backend/.env` and fill in your values:
 PORT=5000
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/travellog?retryWrites=true&w=majority
 NODE_ENV=development
+JWT_SECRET=replace_with_a_long_random_secret
+JWT_EXPIRES_IN=1d
+CLIENT_URL=http://localhost:3000
 ```
 
 > **⚠️ `.env` rules — common mistakes to avoid:**
@@ -134,7 +161,7 @@ NODE_ENV=development
 **Install dependencies:**
 
 ```bash
-npm install
+npm ci
 ```
 
 **Start the backend:**
@@ -174,24 +201,12 @@ GET http://localhost:5000/api/health
 cd frontend
 ```
 
-**Create the environment file:**
-
-```bash
-# Windows
-copy .env.example .env
-
-# macOS / Linux
-cp .env.example .env
-```
-
-```env
-VITE_API_URL=http://localhost:5000/api
-```
+From the repository root, open a separate terminal. The frontend uses relative `/api` requests and the Vite development proxy; no frontend environment file is required for local development.
 
 **Install dependencies and start:**
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -202,7 +217,7 @@ npm run dev
   ➜  Local:   http://localhost:3000/
 ```
 
-> The Vite dev server automatically proxies all `/api/*` requests to `localhost:5000` — no CORS configuration needed.
+> The Vite dev server automatically proxies all `/api/*` requests to `localhost:5000` — the backend also restricts browser origins using `CLIENT_URL`.
 
 ---
 
@@ -216,7 +231,7 @@ Open **two terminals** side by side:
 | **2 — Frontend** | `frontend/` | `npm run dev` |
 
 Then open **`http://localhost:3000`** in your browser.  
-You should see ✅ for both **React running** and **Backend API connected**.
+The login page should appear. Register or sign in to access the dashboard.
 
 ---
 
@@ -232,7 +247,9 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | `jsonwebtoken` | ^9.0.3 | Signs and verifies stateless JWT Bearer tokens for route authorization |
 | `dotenv` | ^18.0.9 | Loads `KEY=VALUE` pairs from `.env` into `process.env` at startup |
 | `cors` | ^2.8.6 | Adds HTTP headers allowing the React frontend (port 3000) to call the API (port 5000) |
-| `nodemon` *(dev)* | ^3.1.14 | Watches files and auto-restarts the server on save — development only |
+| `helmet` | ^8.3.0 | Security-related HTTP response headers |
+| `express-rate-limit` | ^8.7.4 | Restricts repeated authentication attempts |
+| `nodemon` *(dev)* | 3.1.11 | Watches files and auto-restarts the server on save — development only |
 
 ### Frontend
 
@@ -241,7 +258,7 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | `react` | ^19.3.1 | UI component library — `useState` for data, `useEffect` for side effects |
 | `react-dom` | ^19.3.1 | Renders the React component tree into `index.html` in the browser |
 | `vite` | ^8.3.6 | Dev server with hot module replacement; bundles for production; proxies `/api` |
-| `@vitejs/plugin-react` | ^6.1.2 | Enables JSX compilation and React fast refresh inside Vite |
+| `@vitejs/plugin-react` | ^6.2.1 | Enables JSX compilation and React fast refresh inside Vite |
 
 ---
 
@@ -257,11 +274,9 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | `JWT_SECRET` | Secret key used to sign and verify JWT tokens | `your_secret_key` |
 | `JWT_EXPIRES_IN` | Token validity duration | `1d` |
 
-### `frontend/.env`
+| `CLIENT_URL` | Allowed browser origin | `http://localhost:3000` |
 
-| Variable | Description | Example |
-| :------- | :---------- | :------ |
-| `VITE_API_URL` | Base URL for backend API calls | `http://localhost:5000/api` |
+Never commit `.env` or real credentials.
 
 ---
 
@@ -269,7 +284,7 @@ You should see ✅ for both **React running** and **Backend API connected**.
 
 | Method | Endpoint | Description | Auth Required |
 | :----- | :------- | :---------- | :------------ |
-| `GET` | `/api/health` | Server and DB health check | ❌ Public |
+| `GET` | `/api/health` | API health endpoint | ❌ Public |
 | `POST` | `/api/auth/register` | Register new user account | ❌ Public |
 | `POST` | `/api/auth/login` | Authenticate and obtain JWT token | ❌ Public |
 | `GET` | `/api/auth/me` | Retrieve authenticated user profile | 🔒 Protected (Bearer Token) |
@@ -295,7 +310,7 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | `DELETE` | `/api/trips/:tripId/expenses/:expenseId` | Delete expense record (Task 17) | 🔒 Protected (Bearer Token) |
 | `GET` | `/api/public/trips/:tripId` | View a public shared trip (entries & photos, no expenses) (Task 21) | ❌ Public |
 
-> More endpoints will be added per task. See [`Requirement-Analysis-&-Plan.md`](./Requirement-Analysis-&-Plan.md) → Appendix B for the full planned API.
+Protected endpoints require `Authorization: Bearer <token>`. JSON requests use `Content-Type: application/json`.
 
 ---
 
@@ -329,8 +344,55 @@ You should see ✅ for both **React running** and **Backend API connected**.
 | Task 24 | Database trip cascade deletion with atomic MongoDB transactions (trips, journals, photos, expenses) | ✅ Done |
 | Task 25 | Database journal cascade deletion & photo cleanup with atomic MongoDB transactions | ✅ Done |
 | Task 26 | Comprehensive UI/UX redesign, modern styling (index.css/App.css) & mobile responsiveness | ✅ Done |
-| Task 27 | Final testing, deployment & submission | 🟡 In progress — Stage 1 complete |
+| Task 27 | Final testing, deployment & submission | Local testing completed; public deployment and submission pending |
 
 ---
 
 > Internal university planning, specification, testing checklists, report, and presentation notes are kept locally via `.gitignore`. Only `README.md` and application source code are tracked in Git.
+
+
+## Security and validation
+
+- bcrypt password hashing (12 rounds), JWT bearer authentication and owner-scoped database queries.
+- Explicit field allowlists, ObjectId checks, strict date-only inputs and field type/length checks.
+- HTTP(S) photo URL validation; numeric expense validation with up to two decimal places and totals calculated in integer cents.
+- Helmet response headers, disabled X-Powered-By header, 100 KB JSON body limit and generic internal error responses.
+- Configurable CORS origin and authentication rate limiting (10 unsuccessful attempts per 15-minute window, shared between login and registration).
+- Public API returns selected trip, journal and photo fields only; private trips and expenses are excluded.
+
+## Dependency audit and remediation
+
+The backend development audit initially identified a moderate minimatch denial-of-service advisory through Nodemon 3.1.14 (minimatch 10.2.6). The production-only audit was clear. The dependency tree was inspected with `npm ls minimatch` and `npm explain minimatch`, and remediation was evaluated with `npm audit fix --dry-run --json`. Rather than applying a broad forced upgrade, Nodemon was pinned to 3.1.11 using `npm install --save-dev --save-exact nodemon@3.1.11`. The package manifest and lockfile were updated. Subsequent full and production-only audits for backend and frontend were reported clear. Audit findings are point-in-time results, not a guarantee of security.
+
+## Testing
+
+Project testing records report 535 checks across development, validation, security and regression activities. These are cumulative reported checks, not 535 unique automated tests. Validation alone covered 242 checks across authentication (22), trips (36), journals (47), photos (53) and expenses (84). Testing used Postman, browser interactions, npm audit and production builds. The development log also records 57 passing live HTTP assertions and 15 backend syntax checks. Detailed evidence is maintained in the local testing checklist. No automated UI test suite is claimed.
+
+## Production build and deployment
+
+From the frontend directory run `npm ci` and `npm run build`. The output is generated in `frontend/dist`. From the backend directory run `npm ci --omit=dev` and `npm start` with production environment variables configured. A production host must route `/api` requests to Express and support the `/shared/:tripId` frontend fallback. Configure HTTPS, Atlas database access and the correct `CLIENT_URL` for the deployment. The development proxy alone is not a production hosting solution.
+
+Public deployment URL: pending verification. Local production build success does not establish public cloud deployment.
+
+## Screenshots and demonstration
+
+Application screenshots and a demonstration can be added after capturing the final running application. Suggested views: login, dashboard, trips, journal, gallery, expenses, timeline and public sharing. Do not include credentials, tokens or connection strings.
+
+## Limitations and future improvements
+
+Photos use external URLs rather than binary uploads. External images may become unavailable or expose visitor network information to their hosts. JWTs are stored in sessionStorage, which remains accessible to same-origin scripts. The development rate limiter uses an in-memory store. Future improvements include managed image storage, automated regression tests and production-grade distributed rate limiting. No maps, live currency conversion or booking integration is claimed.
+
+## References and AI acknowledgement
+
+- [React documentation](https://react.dev/)
+- [Vite documentation](https://vite.dev/)
+- [Express documentation](https://expressjs.com/)
+- [Mongoose documentation](https://mongoosejs.com/)
+- [MongoDB Atlas documentation](https://www.mongodb.com/docs/atlas/)
+- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)
+- [Helmet](https://helmetjs.github.io/)
+- [express-rate-limit](https://express-rate-limit.mintlify.app/)
+
+ChatGPT was used during planning, implementation guidance, debugging, security review, test design and documentation drafting. The developer is responsible for reviewing, understanding, testing and explaining the submitted implementation. Detailed assistance references are recorded in the local specification and should be included in the coursework disclosure as required.
+
+
