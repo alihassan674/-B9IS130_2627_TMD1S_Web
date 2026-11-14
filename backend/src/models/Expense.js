@@ -26,6 +26,13 @@ const expenseSchema = new mongoose.Schema(
             },
         },
 
+        currency: {
+            type: String,
+            enum: ['USD'],
+            default: 'USD',
+            immutable: true,
+        },
+
         category: {
             type: String,
             required: true,

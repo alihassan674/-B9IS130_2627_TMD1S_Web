@@ -156,6 +156,9 @@ function EditJournalEntry({
                             type="date"
                             name="entryDate"
                             value={form.entryDate}
+                            onClick={(event) =>
+                                event.currentTarget.showPicker?.()
+                            }
                             onChange={handleChange}
                             required
                         />

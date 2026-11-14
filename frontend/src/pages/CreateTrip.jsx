@@ -177,6 +177,9 @@ function CreateTrip({ onTripCreated }) {
                             type="date"
                             name="startDate"
                             value={form.startDate}
+                            onClick={(event) =>
+                                event.currentTarget.showPicker?.()
+                            }
                             onChange={handleChange}
                             required
                         />
@@ -192,6 +195,9 @@ function CreateTrip({ onTripCreated }) {
                             name="endDate"
                             value={form.endDate}
                             min={form.startDate || undefined}
+                            onClick={(event) =>
+                                event.currentTarget.showPicker?.()
+                            }
                             onChange={handleChange}
                             required
                         />

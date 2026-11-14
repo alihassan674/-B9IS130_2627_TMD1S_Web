@@ -27,11 +27,15 @@ const emptyForm = {
     notes: '',
 }
 
+const usdFormatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+})
+
 const formatAmount = (amount) =>
-    Number(amount || 0).toLocaleString('en-GB', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    })
+    usdFormatter.format(Number(amount || 0))
 
 const formatDate = (date) => {
     if (!date) return 'Date unavailable'
@@ -70,7 +74,7 @@ function ExpenseFields({ values, onChange, prefix }) {
 
             <div className="expense-field">
                 <label htmlFor={`${prefix}-amount`}>
-                    Amount
+                    Amount (USD $)
                 </label>
                 <input
                     id={`${prefix}-amount`}
@@ -113,6 +117,9 @@ function ExpenseFields({ values, onChange, prefix }) {
                     name="expenseDate"
                     type="date"
                     value={values.expenseDate}
+                    onClick={(event) =>
+                        event.currentTarget.showPicker?.()
+                    }
                     onChange={onChange}
                     required
                 />

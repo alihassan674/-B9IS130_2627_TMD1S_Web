@@ -123,6 +123,24 @@ function MyTrips() {
         }
     }
 
+    const handlePanelToggle = (panel, tripId) => {
+        const isAlreadyOpen =
+            (panel === 'journal' && selectedJournalTripId === tripId) ||
+            (panel === 'expenses' && selectedExpenseTripId === tripId) ||
+            (panel === 'timeline' && selectedTimelineTripId === tripId)
+
+        // Only one trip-detail panel can be open at a time.
+        setSelectedJournalTripId(null)
+        setSelectedExpenseTripId(null)
+        setSelectedTimelineTripId(null)
+
+        if (isAlreadyOpen) return
+
+        if (panel === 'journal') setSelectedJournalTripId(tripId)
+        if (panel === 'expenses') setSelectedExpenseTripId(tripId)
+        if (panel === 'timeline') setSelectedTimelineTripId(tripId)
+    }
+
     const handleDelete = async (tripId) => {
         const confirmed = window.confirm(
             'Delete this trip and all its journals, photos, and expenses? This cannot be undone.'
@@ -338,11 +356,7 @@ function MyTrips() {
                                             className="mytrips-btn-secondary"
                                             aria-expanded={selectedJournalTripId === trip._id}
                                             onClick={() =>
-                                                setSelectedJournalTripId(
-                                                    selectedJournalTripId === trip._id
-                                                        ? null
-                                                        : trip._id
-                                                )
+                                                handlePanelToggle('journal', trip._id)
                                             }
                                         >
                                             {selectedJournalTripId === trip._id
@@ -355,11 +369,7 @@ function MyTrips() {
                                             className="mytrips-btn-secondary"
                                             aria-expanded={selectedExpenseTripId === trip._id}
                                             onClick={() =>
-                                                setSelectedExpenseTripId(
-                                                    selectedExpenseTripId === trip._id
-                                                        ? null
-                                                        : trip._id
-                                                )
+                                                handlePanelToggle('expenses', trip._id)
                                             }
                                         >
                                             {selectedExpenseTripId === trip._id
@@ -372,11 +382,7 @@ function MyTrips() {
                                             className="mytrips-btn-secondary"
                                             aria-expanded={selectedTimelineTripId === trip._id}
                                             onClick={() =>
-                                                setSelectedTimelineTripId(
-                                                    selectedTimelineTripId === trip._id
-                                                        ? null
-                                                        : trip._id
-                                                )
+                                                handlePanelToggle('timeline', trip._id)
                                             }
                                         >
                                             {selectedTimelineTripId === trip._id

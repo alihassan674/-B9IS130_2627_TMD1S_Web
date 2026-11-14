@@ -380,7 +380,7 @@ Application screenshots and a demonstration can be added after capturing the fin
 
 ## Limitations and future improvements
 
-Photos use external URLs rather than binary uploads. External images may become unavailable or expose visitor network information to their hosts. JWTs are stored in sessionStorage, which remains accessible to same-origin scripts. The development rate limiter uses an in-memory store. Future improvements include managed image storage, automated regression tests and production-grade distributed rate limiting. No maps, live currency conversion or booking integration is claimed.
+Photos use external URLs rather than binary uploads. External images may become unavailable or expose visitor network information to their hosts. JWTs are stored in sessionStorage, which remains accessible to same-origin scripts. The development rate limiter uses an in-memory store. All expense values are recorded and displayed in US dollars (`USD`, `$`); live currency conversion is not provided. Future improvements include managed image storage, automated regression tests and production-grade distributed rate limiting. No maps or booking integration is claimed.
 
 ## References and AI acknowledgement
 
