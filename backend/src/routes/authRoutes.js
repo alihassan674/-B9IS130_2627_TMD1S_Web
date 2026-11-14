@@ -3,8 +3,22 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const protect = require('../middleware/authMiddleware');
+const { rateLimit } = require('express-rate-limit');
 
 const router = express.Router();
+
+// Limit repeated authentication requests
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  message: {
+    message:
+      'Too many authentication attempts. Please try again after 15 minutes.',
+  },
+});
 
 // Generate JWT token
 const generateToken = (userId) => {
@@ -16,7 +30,7 @@ const generateToken = (userId) => {
 };
 
 // POST /api/auth/register
-router.post('/register', async (req, res, next) => {
+router.post('/register', authLimiter, async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
@@ -76,7 +90,7 @@ router.post('/register', async (req, res, next) => {
 });
 
 // POST /api/auth/login
-router.post('/login', async (req, res, next) => {
+router.post('/login', authLimiter, async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
