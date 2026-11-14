@@ -9,7 +9,7 @@ const protect = require('../middleware/authMiddleware')
 
 const router = express.Router()
 
-// All routes below require a valid JWT
+// All routes require a valid JWT
 router.use(protect)
 
 const allowedFields = [
@@ -18,27 +18,185 @@ const allowedFields = [
     'startDate',
     'endDate',
     'description',
-    'isPublic', // NEW: Allow public sharing
+    'isPublic',
 ]
+
+// Validate date format and actual calendar date
+const isValidDate = (value) => {
+    if (
+        typeof value !== 'string' ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(value)
+    ) {
+        return false
+    }
+
+    const date = new Date(value)
+
+    return (
+        !Number.isNaN(date.getTime()) &&
+        date.toISOString().slice(0, 10) === value
+    )
+}
+
+// Validate trip creation and update input
+const validateTripInput = (body, existingTrip = null) => {
+    if (
+        !body ||
+        typeof body !== 'object' ||
+        Array.isArray(body)
+    ) {
+        return {
+            error: 'A valid request body is required',
+        }
+    }
+
+    const tripData = {}
+
+    // Copy only permitted fields
+    for (const field of allowedFields) {
+        if (Object.prototype.hasOwnProperty.call(body, field)) {
+            tripData[field] = body[field]
+        }
+    }
+
+    const providedFields = Object.keys(tripData)
+
+    // Reject empty update requests
+    if (existingTrip && providedFields.length === 0) {
+        return {
+            error: 'At least one valid trip field is required',
+        }
+    }
+
+    // Required fields for new trips
+    if (!existingTrip) {
+        const requiredFields = [
+            'title',
+            'destination',
+            'startDate',
+            'endDate',
+        ]
+
+        for (const field of requiredFields) {
+            if (tripData[field] === undefined) {
+                return {
+                    error: `${field} is required`,
+                }
+            }
+        }
+    }
+
+    // Validate title
+    if (providedFields.includes('title')) {
+        if (
+            typeof tripData.title !== 'string' ||
+            !tripData.title.trim()
+        ) {
+            return {
+                error: 'Title must be a non-empty string',
+            }
+        }
+
+        tripData.title = tripData.title.trim()
+
+        if (tripData.title.length > 100) {
+            return {
+                error: 'Title must not exceed 100 characters',
+            }
+        }
+    }
+
+    // Validate destination
+    if (providedFields.includes('destination')) {
+        if (
+            typeof tripData.destination !== 'string' ||
+            !tripData.destination.trim()
+        ) {
+            return {
+                error: 'Destination must be a non-empty string',
+            }
+        }
+
+        tripData.destination = tripData.destination.trim()
+
+        if (tripData.destination.length > 100) {
+            return {
+                error: 'Destination must not exceed 100 characters',
+            }
+        }
+    }
+
+    // Validate optional description
+    if (providedFields.includes('description')) {
+        if (typeof tripData.description !== 'string') {
+            return {
+                error: 'Description must be a string',
+            }
+        }
+
+        tripData.description = tripData.description.trim()
+
+        if (tripData.description.length > 1000) {
+            return {
+                error: 'Description must not exceed 1000 characters',
+            }
+        }
+    }
+
+    // Validate start date
+    if (providedFields.includes('startDate')) {
+        if (!isValidDate(tripData.startDate)) {
+            return {
+                error: 'Start date must be a valid date in YYYY-MM-DD format',
+            }
+        }
+    }
+
+    // Validate end date
+    if (providedFields.includes('endDate')) {
+        if (!isValidDate(tripData.endDate)) {
+            return {
+                error: 'End date must be a valid date in YYYY-MM-DD format',
+            }
+        }
+    }
+
+    // Use existing dates when performing partial updates
+    const startDate = providedFields.includes('startDate')
+        ? new Date(tripData.startDate)
+        : existingTrip?.startDate
+
+    const endDate = providedFields.includes('endDate')
+        ? new Date(tripData.endDate)
+        : existingTrip?.endDate
+
+    if (startDate && endDate && endDate < startDate) {
+        return {
+            error: 'End date must be on or after start date',
+        }
+    }
+
+    // Validate public sharing value
+    if (
+        providedFields.includes('isPublic') &&
+        typeof tripData.isPublic !== 'boolean'
+    ) {
+        return {
+            error: 'isPublic must be true or false',
+        }
+    }
+
+    return { tripData }
+}
 
 // POST /api/trips - Create a new trip
 router.post('/', async (req, res) => {
     try {
-        const tripData = {}
+        const { tripData, error } = validateTripInput(req.body)
 
-        for (const field of allowedFields) {
-            if (req.body[field] !== undefined) {
-                tripData[field] = req.body[field]
-            }
-        }
-
-        // NEW: Validate isPublic when provided
-        if (
-            tripData.isPublic !== undefined &&
-            typeof tripData.isPublic !== 'boolean'
-        ) {
+        if (error) {
             return res.status(400).json({
-                message: 'isPublic must be true or false',
+                message: error,
             })
         }
 
@@ -62,13 +220,14 @@ router.post('/', async (req, res) => {
         }
 
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to create trip',
         })
     }
 })
 
-// GET /api/trips - Get the logged-in user's trips
+// GET /api/trips - Get logged-in user's trips
 router.get('/', async (req, res) => {
     try {
         const trips = await Trip.find({
@@ -78,6 +237,7 @@ router.get('/', async (req, res) => {
         res.status(200).json({ trips })
     } catch (error) {
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to fetch trips',
         })
@@ -112,6 +272,7 @@ router.get('/:id', async (req, res) => {
         res.status(200).json({ trip })
     } catch (error) {
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to fetch trip',
         })
@@ -121,6 +282,7 @@ router.get('/:id', async (req, res) => {
 // PUT /api/trips/:id - Update an owned trip
 router.put('/:id', async (req, res) => {
     try {
+        // Verify ownership before updating
         const trip = await Trip.findOne({
             _id: req.params.id,
             user: req.user.id,
@@ -132,21 +294,20 @@ router.put('/:id', async (req, res) => {
             })
         }
 
-        // NEW: Validate public sharing value
-        if (
-            req.body.isPublic !== undefined &&
-            typeof req.body.isPublic !== 'boolean'
-        ) {
+        const { tripData, error } = validateTripInput(
+            req.body,
+            trip
+        )
+
+        if (error) {
             return res.status(400).json({
-                message: 'isPublic must be true or false',
+                message: error,
             })
         }
 
-        // Update only permitted fields
-        for (const field of allowedFields) {
-            if (req.body[field] !== undefined) {
-                trip[field] = req.body[field]
-            }
+        // Update only validated permitted fields
+        for (const field of Object.keys(tripData)) {
+            trip[field] = tripData[field]
         }
 
         await trip.save()
@@ -166,13 +327,12 @@ router.put('/:id', async (req, res) => {
         }
 
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to update trip',
         })
     }
 })
-
-// DELETE /api/trips/:id - Delete an owned trip
 
 // DELETE /api/trips/:id
 // Delete an owned trip and its related data
@@ -195,7 +355,7 @@ router.delete('/:id', async (req, res) => {
                 throw error
             }
 
-            // Find all journal entries belonging to this trip
+            // Find associated journal entries
             const entries = await JournalEntry.find({
                 trip: trip._id,
             })
@@ -206,17 +366,17 @@ router.delete('/:id', async (req, res) => {
                 (entry) => entry._id
             )
 
-            // Delete photos belonging to these entries
+            // Delete photos belonging to journal entries
             await Photo.deleteMany({
                 journalEntry: { $in: entryIds },
             }).session(session)
 
-            // Delete all journal entries
+            // Delete journal entries
             await JournalEntry.deleteMany({
                 trip: trip._id,
             }).session(session)
 
-            // Delete all expenses
+            // Delete expenses
             await Expense.deleteMany({
                 trip: trip._id,
             }).session(session)
