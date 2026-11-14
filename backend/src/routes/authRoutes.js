@@ -1,3 +1,4 @@
+
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -20,6 +21,14 @@ const authLimiter = rateLimit({
   },
 });
 
+// Validate email format
+const isValidEmail = (email) => {
+  return (
+    email.length <= 254 &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  );
+};
+
 // Generate JWT token
 const generateToken = (userId) => {
   return jwt.sign(
@@ -32,24 +41,64 @@ const generateToken = (userId) => {
 // POST /api/auth/register
 router.post('/register', authLimiter, async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password } = req.body || {};
+
+    // Validate field data types
+    if (
+      typeof name !== 'string' ||
+      typeof email !== 'string' ||
+      typeof password !== 'string'
+    ) {
+      return res.status(400).json({
+        message: 'Name, email, and password must be valid text values',
+      });
+    }
+
+    // Normalize name and email
+    const normalizedName = name.trim();
+    const normalizedEmail = email.trim().toLowerCase();
 
     // Validate required fields
-    if (!name || !email || !password) {
+    if (!normalizedName || !normalizedEmail || !password) {
       return res.status(400).json({
         message: 'Name, email, and password are required',
       });
     }
 
-    // Validate password length
+    // Validate name length
+    if (normalizedName.length > 100) {
+      return res.status(400).json({
+        message: 'Name must not exceed 100 characters',
+      });
+    }
+
+    // Validate email format
+    if (!isValidEmail(normalizedEmail)) {
+      return res.status(400).json({
+        message: 'Please enter a valid email address',
+      });
+    }
+
+    // Validate minimum password length
     if (password.length < 8) {
       return res.status(400).json({
         message: 'Password must be at least 8 characters long',
       });
     }
 
-    // Normalize email
-    const normalizedEmail = email.trim().toLowerCase();
+    // Reject whitespace-only passwords
+    if (!password.trim()) {
+      return res.status(400).json({
+        message: 'Password cannot contain only spaces',
+      });
+    }
+
+    // Prevent bcrypt password truncation
+    if (Buffer.byteLength(password, 'utf8') > 72) {
+      return res.status(400).json({
+        message: 'Password must not exceed 72 UTF-8 bytes',
+      });
+    }
 
     // Check whether user already exists
     const existingUser = await User.findOne({
@@ -67,7 +116,7 @@ router.post('/register', authLimiter, async (req, res, next) => {
 
     // Create user
     const user = await User.create({
-      name: name.trim(),
+      name: normalizedName,
       email: normalizedEmail,
       password: hashedPassword,
     });
@@ -85,6 +134,13 @@ router.post('/register', authLimiter, async (req, res, next) => {
       },
     });
   } catch (error) {
+    // Handle duplicate email database errors
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: 'An account with this email already exists',
+      });
+    }
+
     next(error);
   }
 });
@@ -92,18 +148,43 @@ router.post('/register', authLimiter, async (req, res, next) => {
 // POST /api/auth/login
 router.post('/login', authLimiter, async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
 
-    if (!email || !password) {
+    // Validate field data types
+    if (
+      typeof email !== 'string' ||
+      typeof password !== 'string'
+    ) {
+      return res.status(400).json({
+        message: 'Email and password must be valid text values',
+      });
+    }
+
+    // Normalize email
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Validate required fields
+    if (!normalizedEmail || !password) {
       return res.status(400).json({
         message: 'Email and password are required',
       });
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
+    // Validate email format
+    if (!isValidEmail(normalizedEmail)) {
+      return res.status(400).json({
+        message: 'Please enter a valid email address',
+      });
+    }
 
-    // Password is excluded by default in the User model.
-    // Explicitly include it for password comparison.
+    // Prevent bcrypt password truncation
+    if (Buffer.byteLength(password, 'utf8') > 72) {
+      return res.status(400).json({
+        message: 'Password must not exceed 72 UTF-8 bytes',
+      });
+    }
+
+    // Explicitly include password for comparison
     const user = await User.findOne({
       email: normalizedEmail,
     }).select('+password');
@@ -142,7 +223,6 @@ router.post('/login', authLimiter, async (req, res, next) => {
     next(error);
   }
 });
-
 
 // GET /api/auth/me
 router.get('/me', protect, async (req, res) => {
