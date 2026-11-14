@@ -12,6 +12,134 @@ const router = express.Router({ mergeParams: true })
 // All photo routes require authentication
 router.use(protect)
 
+const allowedFields = [
+    'imageUrl',
+    'caption',
+]
+
+// Validate HTTP and HTTPS image URLs
+const isValidImageUrl = (value) => {
+    if (
+        typeof value !== 'string' ||
+        !/^https?:\/\//i.test(value) ||
+        /[\s\\]/.test(value)
+    ) {
+        return false
+    }
+
+    try {
+        const url = new URL(value)
+
+        return (
+            (
+                url.protocol === 'https:' ||
+                url.protocol === 'http:'
+            ) &&
+            Boolean(url.hostname) &&
+            !url.username &&
+            !url.password
+        )
+    } catch {
+        return false
+    }
+}
+
+// Validate photo creation and update input
+const validatePhotoInput = (
+    body,
+    isUpdate = false
+) => {
+    if (
+        !body ||
+        typeof body !== 'object' ||
+        Array.isArray(body)
+    ) {
+        return {
+            error: 'A valid request body is required',
+        }
+    }
+
+    const photoData = {}
+
+    // Copy only permitted fields
+    for (const field of allowedFields) {
+        if (
+            Object.prototype.hasOwnProperty.call(
+                body,
+                field
+            )
+        ) {
+            photoData[field] = body[field]
+        }
+    }
+
+    const providedFields = Object.keys(photoData)
+
+    // Reject empty update requests
+    if (isUpdate && providedFields.length === 0) {
+        return {
+            error: 'At least one valid photo field is required',
+        }
+    }
+
+    // Image URL is required when creating a photo
+    if (
+        !isUpdate &&
+        photoData.imageUrl === undefined
+    ) {
+        return {
+            error: 'Image URL is required',
+        }
+    }
+
+    // Validate image URL
+    if (providedFields.includes('imageUrl')) {
+        if (
+            typeof photoData.imageUrl !== 'string' ||
+            !photoData.imageUrl.trim()
+        ) {
+            return {
+                error: 'Image URL must be a non-empty string',
+            }
+        }
+
+        photoData.imageUrl =
+            photoData.imageUrl.trim()
+
+        if (photoData.imageUrl.length > 2000) {
+            return {
+                error: 'Image URL must not exceed 2000 characters',
+            }
+        }
+
+        if (!isValidImageUrl(photoData.imageUrl)) {
+            return {
+                error: 'Please provide a valid HTTP or HTTPS image URL',
+            }
+        }
+    }
+
+    // Validate optional caption
+    if (providedFields.includes('caption')) {
+        if (typeof photoData.caption !== 'string') {
+            return {
+                error: 'Caption must be a string',
+            }
+        }
+
+        photoData.caption =
+            photoData.caption.trim()
+
+        if (photoData.caption.length > 300) {
+            return {
+                error: 'Caption must not exceed 300 characters',
+            }
+        }
+    }
+
+    return { photoData }
+}
+
 // Check that the journal belongs to the logged-in user
 router.use(async (req, res, next) => {
     try {
@@ -23,7 +151,9 @@ router.use(async (req, res, next) => {
             })
         }
 
-        const entry = await JournalEntry.findById(entryId)
+        const entry = await JournalEntry.findById(
+            entryId
+        )
 
         if (!entry) {
             return res.status(404).json({
@@ -46,6 +176,7 @@ router.use(async (req, res, next) => {
         next()
     } catch (error) {
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to verify journal ownership',
         })
@@ -66,12 +197,18 @@ router.param('photoId', (req, res, next, photoId) => {
 // CREATE PHOTO
 router.post('/', async (req, res) => {
     try {
-        const { imageUrl, caption } = req.body
+        const { photoData, error } =
+            validatePhotoInput(req.body)
+
+        if (error) {
+            return res.status(400).json({
+                message: error,
+            })
+        }
 
         const photo = await Photo.create({
+            ...photoData,
             journalEntry: req.journalEntry._id,
-            imageUrl,
-            caption,
         })
 
         res.status(201).json({
@@ -89,6 +226,7 @@ router.post('/', async (req, res) => {
         }
 
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to add photo',
         })
@@ -105,6 +243,7 @@ router.get('/', async (req, res) => {
         res.status(200).json({ photos })
     } catch (error) {
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to fetch photos',
         })
@@ -128,6 +267,7 @@ router.get('/:photoId', async (req, res) => {
         res.status(200).json({ photo })
     } catch (error) {
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to fetch photo',
         })
@@ -137,6 +277,7 @@ router.get('/:photoId', async (req, res) => {
 // UPDATE PHOTO
 router.put('/:photoId', async (req, res) => {
     try {
+        // Verify that the photo belongs to this journal
         const photo = await Photo.findOne({
             _id: req.params.photoId,
             journalEntry: req.journalEntry._id,
@@ -148,14 +289,18 @@ router.put('/:photoId', async (req, res) => {
             })
         }
 
-        const { imageUrl, caption } = req.body
+        const { photoData, error } =
+            validatePhotoInput(req.body, true)
 
-        if (imageUrl !== undefined) {
-            photo.imageUrl = imageUrl
+        if (error) {
+            return res.status(400).json({
+                message: error,
+            })
         }
 
-        if (caption !== undefined) {
-            photo.caption = caption
+        // Update only validated permitted fields
+        for (const field of Object.keys(photoData)) {
+            photo[field] = photoData[field]
         }
 
         await photo.save()
@@ -175,6 +320,7 @@ router.put('/:photoId', async (req, res) => {
         }
 
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to update photo',
         })
@@ -200,6 +346,7 @@ router.delete('/:photoId', async (req, res) => {
         })
     } catch (error) {
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to delete photo',
         })
