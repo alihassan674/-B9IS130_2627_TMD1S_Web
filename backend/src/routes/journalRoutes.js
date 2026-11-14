@@ -12,6 +12,130 @@ const router = express.Router({ mergeParams: true })
 // All journal routes require authentication
 router.use(protect)
 
+const allowedFields = [
+    'title',
+    'entryDate',
+    'content',
+]
+
+// Validate date format and actual calendar date
+const isValidDate = (value) => {
+    if (
+        typeof value !== 'string' ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(value)
+    ) {
+        return false
+    }
+
+    const date = new Date(value)
+
+    return (
+        !Number.isNaN(date.getTime()) &&
+        date.toISOString().slice(0, 10) === value
+    )
+}
+
+// Validate journal creation and update input
+const validateJournalInput = (
+    body,
+    isUpdate = false
+) => {
+    if (
+        !body ||
+        typeof body !== 'object' ||
+        Array.isArray(body)
+    ) {
+        return {
+            error: 'A valid request body is required',
+        }
+    }
+
+    const journalData = {}
+
+    // Copy only permitted fields
+    for (const field of allowedFields) {
+        if (
+            Object.prototype.hasOwnProperty.call(
+                body,
+                field
+            )
+        ) {
+            journalData[field] = body[field]
+        }
+    }
+
+    const providedFields = Object.keys(journalData)
+
+    // Reject empty update requests
+    if (isUpdate && providedFields.length === 0) {
+        return {
+            error: 'At least one valid journal field is required',
+        }
+    }
+
+    // Required fields for new journal entries
+    if (!isUpdate) {
+        for (const field of allowedFields) {
+            if (journalData[field] === undefined) {
+                return {
+                    error: `${field} is required`,
+                }
+            }
+        }
+    }
+
+    // Validate journal title
+    if (providedFields.includes('title')) {
+        if (
+            typeof journalData.title !== 'string' ||
+            !journalData.title.trim()
+        ) {
+            return {
+                error: 'Title must be a non-empty string',
+            }
+        }
+
+        journalData.title = journalData.title.trim()
+
+        if (journalData.title.length > 150) {
+            return {
+                error: 'Title must not exceed 150 characters',
+            }
+        }
+    }
+
+    // Validate journal entry date
+    if (providedFields.includes('entryDate')) {
+        if (!isValidDate(journalData.entryDate)) {
+            return {
+                error: 'Entry date must be a valid date in YYYY-MM-DD format',
+            }
+        }
+    }
+
+    // Validate journal content
+    if (providedFields.includes('content')) {
+        if (
+            typeof journalData.content !== 'string' ||
+            !journalData.content.trim()
+        ) {
+            return {
+                error: 'Content must be a non-empty string',
+            }
+        }
+
+        journalData.content = journalData.content.trim()
+
+        if (journalData.content.length > 5000) {
+            return {
+                error: 'Content must not exceed 5000 characters',
+            }
+        }
+    }
+
+    return { journalData }
+}
+
 // Check that the logged-in user owns the trip
 router.use(async (req, res, next) => {
     try {
@@ -36,13 +160,14 @@ router.use(async (req, res, next) => {
         next()
     } catch (error) {
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to verify trip ownership',
         })
     }
 })
 
-// Check entry ID format
+// Check journal entry ID format
 router.param('entryId', (req, res, next, entryId) => {
     if (!mongoose.isValidObjectId(entryId)) {
         return res.status(400).json({
@@ -56,13 +181,18 @@ router.param('entryId', (req, res, next, entryId) => {
 // POST - Create a journal entry
 router.post('/', async (req, res) => {
     try {
-        const { title, entryDate, content } = req.body
+        const { journalData, error } =
+            validateJournalInput(req.body)
+
+        if (error) {
+            return res.status(400).json({
+                message: error,
+            })
+        }
 
         const entry = await JournalEntry.create({
+            ...journalData,
             trip: req.trip._id,
-            title,
-            entryDate,
-            content,
         })
 
         res.status(201).json({
@@ -80,6 +210,7 @@ router.post('/', async (req, res) => {
         }
 
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to create journal entry',
         })
@@ -96,6 +227,7 @@ router.get('/', async (req, res) => {
         res.status(200).json({ entries })
     } catch (error) {
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to fetch journal entries',
         })
@@ -119,6 +251,7 @@ router.get('/:entryId', async (req, res) => {
         res.status(200).json({ entry })
     } catch (error) {
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to fetch journal entry',
         })
@@ -128,6 +261,7 @@ router.get('/:entryId', async (req, res) => {
 // PUT - Update a journal entry
 router.put('/:entryId', async (req, res) => {
     try {
+        // Verify that the journal belongs to this trip
         const entry = await JournalEntry.findOne({
             _id: req.params.entryId,
             trip: req.trip._id,
@@ -139,12 +273,18 @@ router.put('/:entryId', async (req, res) => {
             })
         }
 
-        const allowedFields = ['title', 'entryDate', 'content']
+        const { journalData, error } =
+            validateJournalInput(req.body, true)
 
-        for (const field of allowedFields) {
-            if (req.body[field] !== undefined) {
-                entry[field] = req.body[field]
-            }
+        if (error) {
+            return res.status(400).json({
+                message: error,
+            })
+        }
+
+        // Update only validated permitted fields
+        for (const field of Object.keys(journalData)) {
+            entry[field] = journalData[field]
         }
 
         await entry.save()
@@ -164,13 +304,12 @@ router.put('/:entryId', async (req, res) => {
         }
 
         console.error(error)
+
         res.status(500).json({
             message: 'Failed to update journal entry',
         })
     }
 })
-
-// DELETE - Delete a journal entry
 
 // DELETE /api/trips/:tripId/journals/:entryId
 // Delete an owned journal entry and its photos
@@ -253,6 +392,5 @@ router.delete('/:entryId', async (req, res) => {
         }
     }
 })
-
 
 module.exports = router
