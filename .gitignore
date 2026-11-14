@@ -34,4 +34,8 @@ testinglist.md
 All-Project-Data.md
 All-Project-Data.docx
 
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
 
