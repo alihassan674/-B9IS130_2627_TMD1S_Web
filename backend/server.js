@@ -19,7 +19,26 @@ app.disable('x-powered-by');
 
 app.use(helmet());
 
-app.use(cors());
+// Allow requests from trusted frontend origins
+const allowedOrigins = [
+  process.env.CLIENT_URL || 'http://localhost:3000',
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests without a browser origin,
+      // such as Postman and server-to-server requests
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(null, false);
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
 app.use(express.json({ limit: '100kb' }));
 
