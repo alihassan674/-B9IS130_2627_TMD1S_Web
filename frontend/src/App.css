@@ -118,8 +118,9 @@ button {
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
-button:hover:not(:disabled) {
+:where(button):hover:not(:disabled) {
   background: #115440;
+  color: #ffffff;
 }
 
 button:active:not(:disabled) {
@@ -641,6 +642,7 @@ button:active:not(:disabled) {
 
 .mytrips-btn-secondary:hover:not(:disabled) {
   background: #dcefe3;
+  color: #176b58;
 }
 
 .mytrips-btn-danger {
@@ -651,6 +653,7 @@ button:active:not(:disabled) {
 
 .mytrips-btn-danger:hover:not(:disabled) {
   background: #ffe1dd;
+  color: #b42318;
 }
 
 .mytrips-section-label {
@@ -913,6 +916,7 @@ button:active:not(:disabled) {
 
 .journal-edit-btn:hover:not(:disabled) {
   background: #d6ebde;
+  color: #176b58;
 }
 
 .journal-delete-btn {
@@ -923,6 +927,7 @@ button:active:not(:disabled) {
 
 .journal-delete-btn:hover:not(:disabled) {
   background: #ffe1dd;
+  color: #b42318;
 }
 
 .journal-empty {
@@ -1129,6 +1134,7 @@ button:active:not(:disabled) {
 
 .photo-btn-secondary:hover:not(:disabled) {
   background: #d6ebde;
+  color: #176b58;
 }
 
 .photo-btn-danger {
@@ -1139,6 +1145,7 @@ button:active:not(:disabled) {
 
 .photo-btn-danger:hover:not(:disabled) {
   background: #ffe1dd;
+  color: #b42318;
 }
 
 .photo-gallery-empty {
@@ -1483,10 +1490,20 @@ button:active:not(:disabled) {
   border-color: #d2e7d9;
 }
 
+.expense-secondary-btn:hover:not(:disabled) {
+  background: #d6ebde;
+  color: #176b58;
+}
+
 .expense-danger-btn {
   background: #fff1f0;
   color: #b42318;
   border-color: #f5d1cd;
+}
+
+.expense-danger-btn:hover:not(:disabled) {
+  background: #ffe1dd;
+  color: #b42318;
 }
 
 .expense-edit-form {
@@ -2376,6 +2393,7 @@ button:active:not(:disabled) {
 
 .create-trip-footer button:hover:not(:disabled) {
   background: #105442;
+  color: #ffffff;
 }
 
 .create-trip-footer button:disabled {
@@ -2609,6 +2627,7 @@ button:active:not(:disabled) {
 
 .edit-trip-actions .edit-trip-cancel-btn:hover:not(:disabled) {
   background: #dfece3;
+  color: #355b4d;
 }
 
 .edit-trip-actions .edit-trip-save-btn {
@@ -2619,6 +2638,7 @@ button:active:not(:disabled) {
 
 .edit-trip-actions .edit-trip-save-btn:hover:not(:disabled) {
   background: #105442;
+  color: #ffffff;
 }
 
 .edit-trip-actions button:disabled {
@@ -2850,6 +2870,7 @@ button:active:not(:disabled) {
 
 .create-journal-footer button:hover:not(:disabled) {
   background: #105442;
+  color: #ffffff;
 }
 
 .create-journal-footer button:disabled {
@@ -3086,6 +3107,7 @@ button:active:not(:disabled) {
 
 .edit-journal-actions .edit-journal-cancel-btn:hover:not(:disabled) {
   background: #dfece3;
+  color: #355b4d;
 }
 
 .edit-journal-actions .edit-journal-save-btn {
@@ -3096,6 +3118,7 @@ button:active:not(:disabled) {
 
 .edit-journal-actions .edit-journal-save-btn:hover:not(:disabled) {
   background: #105442;
+  color: #ffffff;
 }
 
 .edit-journal-actions button:disabled {
@@ -3382,6 +3405,11 @@ button:active:not(:disabled) {
   cursor: pointer;
 }
 
+.tl-login-password-toggle:hover:not(:disabled) {
+  background: transparent;
+  color: #105442;
+}
+
 .tl-login-error {
   margin: 0;
   padding: 12px 14px;
@@ -3407,6 +3435,7 @@ button:active:not(:disabled) {
 
 .tl-login-submit:hover:not(:disabled) {
   background: #105442;
+  color: #ffffff;
 }
 
 .tl-login-submit:disabled {
@@ -3445,6 +3474,7 @@ button:active:not(:disabled) {
 }
 
 .tl-login-register-link:hover {
+  background: transparent;
   color: #105442;
 }
 
@@ -3757,6 +3787,11 @@ button:active:not(:disabled) {
   cursor: pointer;
 }
 
+.tl-register-password-toggle:hover:not(:disabled) {
+  background: transparent;
+  color: #105442;
+}
+
 .tl-register-password-hint {
   margin-top: 9px;
   font-size: 12px;
@@ -3793,6 +3828,7 @@ button:active:not(:disabled) {
 
 .tl-register-submit:hover:not(:disabled) {
   background: #105442;
+  color: #ffffff;
 }
 
 .tl-register-submit:disabled {
@@ -3824,6 +3860,8 @@ button:active:not(:disabled) {
 }
 
 .tl-register-login-link:hover {
+  background: transparent;
+  color: #105442;
   text-decoration: underline;
 }
 

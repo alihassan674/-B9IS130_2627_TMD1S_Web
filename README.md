@@ -18,9 +18,9 @@ Non-functional objectives include responsive layouts, maintainable components, i
 
 ```mermaid
 flowchart LR
-    A[React browser UI] -->|REST JSON / JWT| B[Express API]
-    B --> C[Mongoose models]
-    C --> D[(MongoDB Atlas)]
+    frontend["React browser UI"] -->|"REST JSON and JWT"| backend["Express API"]
+    backend --> models["Mongoose models"]
+    models --> database[("MongoDB Atlas")]
 ```
 
 | Parent | Child | Relationship |

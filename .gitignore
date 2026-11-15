@@ -34,6 +34,9 @@ testinglist.md
 All-Project-Data.md
 All-Project-Data.docx
 
+# Project evidence
+evidence/
+
 # Environment variables and secrets
 .env
 .env.*
