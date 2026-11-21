@@ -91,6 +91,7 @@ function ResponsiveFormDialog({
             ref={dialogRef}
             className="responsive-form-dialog"
             aria-label={title}
+            aria-modal="true"
             onClick={handleBackdropClick}
             onChange={handleFormChange}
             onInput={handleFormChange}

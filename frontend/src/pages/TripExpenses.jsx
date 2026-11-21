@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import ResponsiveFormDialog from '../components/ResponsiveFormDialog'
 
 const categories = [
     'Accommodation',
