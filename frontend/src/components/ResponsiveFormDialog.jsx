@@ -1,5 +1,4 @@
-
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 function ResponsiveFormDialog({
@@ -9,14 +8,19 @@ function ResponsiveFormDialog({
     children,
 }) {
     const dialogRef = useRef(null)
-    const closeRef = useRef(onClose)
+
+    const requestCloseRef = useRef(null)
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
+
 
     useEffect(() => {
-        closeRef.current = onClose
-    }, [onClose])
+        if (!open) {
+            setHasUnsavedChanges(false)
+            return
+        }
 
-    useEffect(() => {
-        if (!open) return
+        setHasUnsavedChanges(false)
 
         const dialog = dialogRef.current
         const previousFocus = document.activeElement
@@ -27,7 +31,7 @@ function ResponsiveFormDialog({
 
         const handleCancel = (event) => {
             event.preventDefault()
-            closeRef.current?.()
+            requestCloseRef.current?.()
         }
 
         dialog?.addEventListener('cancel', handleCancel)
@@ -47,9 +51,27 @@ function ResponsiveFormDialog({
 
     const handleBackdropClick = (event) => {
         if (event.target === dialogRef.current) {
-            onClose?.()
+            handleRequestClose()
         }
     }
+
+    const handleFormChange = () => {
+        setHasUnsavedChanges(true)
+    }
+
+    const handleRequestClose = () => {
+        if (hasUnsavedChanges) {
+            const confirmed = window.confirm(
+                'You have unsaved changes. Discard them?'
+            )
+
+            if (!confirmed) return
+        }
+
+        onClose?.()
+    }
+
+    requestCloseRef.current = handleRequestClose
 
     return createPortal(
         <dialog
@@ -57,6 +79,8 @@ function ResponsiveFormDialog({
             className="responsive-form-dialog"
             aria-label={title}
             onClick={handleBackdropClick}
+            onChange={handleFormChange}
+            onInput={handleFormChange}
         >
             <div className="responsive-form-dialog-content">
                 <div className="responsive-form-dialog-toolbar">
@@ -65,7 +89,7 @@ function ResponsiveFormDialog({
                     <button
                         type="button"
                         className="responsive-form-dialog-close"
-                        onClick={onClose}
+                        onClick={handleRequestClose}
                         aria-label="Close form"
                     >
                         ×

@@ -193,15 +193,7 @@ function JournalEntries({ tripId }) {
             <ResponsiveFormDialog
                 open={showCreateJournal}
                 title="Add Journal Entry"
-                onClose={() => {
-                    if (
-                        window.confirm(
-                            'Close this form? Any unsaved changes will be lost.'
-                        )
-                    ) {
-                        setShowCreateJournal(false)
-                    }
-                }}
+                onClose={() => setShowCreateJournal(false)}
             >
                 <CreateJournalEntry
                     tripId={tripId}
@@ -218,15 +210,7 @@ function JournalEntries({ tripId }) {
             <ResponsiveFormDialog
                 open={Boolean(editingEntry)}
                 title="Edit Journal Entry"
-                onClose={() => {
-                    if (
-                        window.confirm(
-                            'Close this form? Any unsaved changes will be lost.'
-                        )
-                    ) {
-                        setEditingEntry(null)
-                    }
-                }}
+                onClose={() => setEditingEntry(null)}
             >
                 {editingEntry && (
                     <EditJournalEntry

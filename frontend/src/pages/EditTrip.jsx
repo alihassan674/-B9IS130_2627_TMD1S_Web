@@ -187,9 +187,6 @@ function EditTrip({ trip, onTripUpdated, onCancel }) {
                             type="date"
                             name="startDate"
                             value={form.startDate}
-                            onClick={(event) =>
-                                event.currentTarget.showPicker?.()
-                            }
                             onChange={handleChange}
                             required
                         />

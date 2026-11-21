@@ -219,11 +219,7 @@ function MyTrips() {
             <ResponsiveFormDialog
                 open={showCreateTrip}
                 title="Create New Trip"
-                onClose={() => {
-                    if (window.confirm('Close this form? Any unsaved changes will be lost.')) {
-                        setShowCreateTrip(false)
-                    }
-                }}
+                onClose={() => setShowCreateTrip(false)}
             >
                 <CreateTrip onTripCreated={handleTripCreated} />
             </ResponsiveFormDialog>
@@ -249,11 +245,7 @@ function MyTrips() {
             <ResponsiveFormDialog
                 open={Boolean(editingTrip)}
                 title="Edit Trip"
-                onClose={() => {
-                    if (window.confirm('Close this form? Any unsaved changes will be lost.')) {
-                        setEditingTrip(null)
-                    }
-                }}
+                onClose={() => setEditingTrip(null)}
             >
                 {editingTrip && (
                     <EditTrip

@@ -491,15 +491,9 @@ function TripExpenses({ tripId }) {
                         onClose={() => {
                             if (saving) return
 
-                            if (
-                                window.confirm(
-                                    'Close this form? Any unsaved changes will be lost.'
-                                )
-                            ) {
-                                setShowAddExpense(false)
-                                setForm({ ...emptyForm })
-                                setError('')
-                            }
+                            setShowAddExpense(false)
+                            setForm({ ...emptyForm })
+                            setError('')
                         }}
                     >
                         <form
@@ -520,6 +514,47 @@ function TripExpenses({ tripId }) {
                                 </button>
                             </div>
                         </form>
+                    </ResponsiveFormDialog>
+
+                    <ResponsiveFormDialog
+                        open={Boolean(editingId)}
+                        title="Edit Expense"
+                        onClose={() => {
+                            if (updating) return
+
+                            cancelEditing()
+                            setError('')
+                        }}
+                    >
+                        {editingId && (
+                            <form
+                                className="expense-edit-form expense-modal-form"
+                                onSubmit={handleUpdate}
+                            >
+                                <ExpenseFields
+                                    values={editForm}
+                                    onChange={handleEditChange}
+                                    prefix={`edit-${editingId}`}
+                                />
+
+                                <div className="expense-actions">
+                                    <button type="submit" disabled={updating}>
+                                        {updating
+                                            ? 'Saving Changes...'
+                                            : 'Save Changes'}
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className="expense-secondary-btn"
+                                        onClick={cancelEditing}
+                                        disabled={updating}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        )}
                     </ResponsiveFormDialog>
 
                     <div className="expense-history-header">
@@ -592,53 +627,6 @@ function TripExpenses({ tripId }) {
                                             {formatAmount(expense.amount)}
                                         </strong>
                                     </div>
-
-                                    <ResponsiveFormDialog
-                                        open={Boolean(editingId)}
-                                        title="Edit Expense"
-                                        onClose={() => {
-                                            if (updating) return
-
-                                            if (
-                                                window.confirm(
-                                                    'Close this form? Any unsaved changes will be lost.'
-                                                )
-                                            ) {
-                                                cancelEditing()
-                                                setError('')
-                                            }
-                                        }}
-                                    >
-                                        {editingId && (
-                                            <form
-                                                className="expense-edit-form expense-modal-form"
-                                                onSubmit={handleUpdate}
-                                            >
-                                                <ExpenseFields
-                                                    values={editForm}
-                                                    onChange={handleEditChange}
-                                                    prefix={`edit-${editingId}`}
-                                                />
-
-                                                <div className="expense-actions">
-                                                    <button type="submit" disabled={updating}>
-                                                        {updating
-                                                            ? 'Saving Changes...'
-                                                            : 'Save Changes'}
-                                                    </button>
-
-                                                    <button
-                                                        type="button"
-                                                        className="expense-secondary-btn"
-                                                        onClick={cancelEditing}
-                                                        disabled={updating}
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        )}
-                                    </ResponsiveFormDialog>
 
                                     <p className="expense-item-date">
                                         📅 {formatDate(expense.expenseDate)}
