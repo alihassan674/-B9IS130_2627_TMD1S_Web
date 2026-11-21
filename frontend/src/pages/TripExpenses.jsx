@@ -1,5 +1,4 @@
-import ResponsiveFormDialog from '../components/ResponsiveFormDialog'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 const categories = [
     'Accommodation',
@@ -158,6 +157,11 @@ function TripExpenses({ tripId }) {
     const [deletingId, setDeletingId] = useState(null)
     const [search, setSearch] = useState('')
     const [categoryFilter, setCategoryFilter] = useState('All')
+    const editExpenseCloseRef = useRef(null)
+
+    const registerEditExpenseClose = useCallback((handler) => {
+        editExpenseCloseRef.current = handler
+    }, [])
 
     const fetchExpenses = async () => {
         const token = sessionStorage.getItem('token')
@@ -432,7 +436,7 @@ function TripExpenses({ tripId }) {
                 <span className="expense-header-icon">💳</span>
             </div>
 
-            {error && (
+            {error && !showAddExpense && !editingId && (
                 <p className="expense-error" role="alert">
                     {error}
                 </p>
@@ -479,7 +483,10 @@ function TripExpenses({ tripId }) {
                         <button
                             type="button"
                             className="expense-open-modal-btn"
-                            onClick={() => setShowAddExpense(true)}
+                            onClick={() => {
+                                setError('')
+                                setShowAddExpense(true)
+                            }}
                         >
                             + Add Expense
                         </button>
@@ -502,6 +509,12 @@ function TripExpenses({ tripId }) {
                         >
                             <p>Record what you spent during your trip.</p>
 
+                            {error && (
+                                <p className="expense-error" role="alert">
+                                    {error}
+                                </p>
+                            )}
+
                             <ExpenseFields
                                 values={form}
                                 onChange={handleChange}
@@ -519,6 +532,7 @@ function TripExpenses({ tripId }) {
                     <ResponsiveFormDialog
                         open={Boolean(editingId)}
                         title="Edit Expense"
+                        onRequestCloseReady={registerEditExpenseClose}
                         onClose={() => {
                             if (updating) return
 
@@ -531,6 +545,12 @@ function TripExpenses({ tripId }) {
                                 className="expense-edit-form expense-modal-form"
                                 onSubmit={handleUpdate}
                             >
+                                {error && (
+                                    <p className="expense-error" role="alert">
+                                        {error}
+                                    </p>
+                                )}
+
                                 <ExpenseFields
                                     values={editForm}
                                     onChange={handleEditChange}
@@ -547,8 +567,10 @@ function TripExpenses({ tripId }) {
                                     <button
                                         type="button"
                                         className="expense-secondary-btn"
-                                        onClick={cancelEditing}
+                                        onClick={() => editExpenseCloseRef.current?.()}
+
                                         disabled={updating}
+
                                     >
                                         Cancel
                                     </button>

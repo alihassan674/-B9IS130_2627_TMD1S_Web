@@ -1,11 +1,11 @@
-
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import CreateTrip from './CreateTrip'
 import EditTrip from './EditTrip'
 import JournalEntries from './JournalEntries'
 import TripExpenses from './TripExpenses'
 import TripTimeline from './TripTimeline'
 import ResponsiveFormDialog from '../components/ResponsiveFormDialog'
+
 
 function MyTrips() {
     const [trips, setTrips] = useState([])
@@ -20,6 +20,8 @@ function MyTrips() {
     const [search, setSearch] = useState('')
     const [filter, setFilter] = useState('all')
     const [showCreateTrip, setShowCreateTrip] = useState(false)
+    const editTripCloseRef = useRef(null)
+
 
     useEffect(() => {
         let active = true
@@ -246,13 +248,16 @@ function MyTrips() {
                 open={Boolean(editingTrip)}
                 title="Edit Trip"
                 onClose={() => setEditingTrip(null)}
+                onRequestCloseReady={(handler) => {
+                    editTripCloseRef.current = handler
+                }}
             >
                 {editingTrip && (
                     <EditTrip
                         key={editingTrip._id}
                         trip={editingTrip}
                         onTripUpdated={handleTripUpdated}
-                        onCancel={() => setEditingTrip(null)}
+                        onCancel={() => editTripCloseRef.current?.()}
                     />
                 )}
             </ResponsiveFormDialog>

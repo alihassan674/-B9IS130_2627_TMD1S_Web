@@ -1,5 +1,4 @@
-
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import CreateJournalEntry from './CreateJournalEntry'
 import EditJournalEntry from './EditJournalEntry'
 import PhotoGallery from './PhotoGallery'
@@ -13,6 +12,11 @@ function JournalEntries({ tripId }) {
     const [deletingId, setDeletingId] = useState(null)
     const [search, setSearch] = useState('')
     const [showCreateJournal, setShowCreateJournal] = useState(false)
+    const editJournalCloseRef = useRef(null)
+
+    const registerEditJournalClose = useCallback((handler) => {
+        editJournalCloseRef.current = handler
+    }, [])
 
     const sortEntries = (items) =>
         [...items].sort(
@@ -211,6 +215,7 @@ function JournalEntries({ tripId }) {
                 open={Boolean(editingEntry)}
                 title="Edit Journal Entry"
                 onClose={() => setEditingEntry(null)}
+                onRequestCloseReady={registerEditJournalClose}
             >
                 {editingEntry && (
                     <EditJournalEntry
@@ -218,7 +223,7 @@ function JournalEntries({ tripId }) {
                         tripId={tripId}
                         entry={editingEntry}
                         onEntryUpdated={handleEntryUpdated}
-                        onCancel={() => setEditingEntry(null)}
+                        onCancel={() => editJournalCloseRef.current?.()}
                     />
                 )}
             </ResponsiveFormDialog>

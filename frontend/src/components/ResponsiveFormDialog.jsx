@@ -6,6 +6,7 @@ function ResponsiveFormDialog({
     title,
     onClose,
     children,
+    onRequestCloseReady,
 }) {
     const dialogRef = useRef(null)
 
@@ -47,6 +48,16 @@ function ResponsiveFormDialog({
         }
     }, [open])
 
+    useEffect(() => {
+        if (!open || !onRequestCloseReady) return
+
+        onRequestCloseReady(() => requestCloseRef.current?.())
+
+        return () => {
+            onRequestCloseReady(null)
+        }
+    }, [open, onRequestCloseReady])
+
     if (!open) return null
 
     const handleBackdropClick = (event) => {
@@ -72,6 +83,8 @@ function ResponsiveFormDialog({
     }
 
     requestCloseRef.current = handleRequestClose
+    // The parent can use this handler for its own Cancel button.
+
 
     return createPortal(
         <dialog
