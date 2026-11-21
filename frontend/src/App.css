@@ -4058,3 +4058,52 @@ button:active:not(:disabled) {
     width: 100%;
   }
 }
+
+/* Expense popup buttons */
+
+.expense-add-panel {
+  display: flex;
+  justify-content: flex-end;
+  margin: 20px 0;
+}
+
+.expense-open-modal-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  background: #176b58;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.expense-open-modal-btn:hover {
+  background: #105241;
+}
+
+.expense-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.expense-modal-form .expense-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .expense-add-panel {
+    justify-content: stretch;
+  }
+
+  .expense-open-modal-btn {
+    width: 100%;
+  }
+
+  .expense-modal-form .expense-actions {
+    flex-wrap: wrap;
+  }
+}

@@ -1,4 +1,4 @@
-
+import ResponsiveFormDialog from '../components/ResponsiveFormDialog'
 import { useEffect, useState } from 'react'
 
 const categories = [
@@ -148,6 +148,7 @@ function TripExpenses({ tripId }) {
     const [totalAmount, setTotalAmount] = useState(0)
     const [expenseCount, setExpenseCount] = useState(0)
     const [form, setForm] = useState({ ...emptyForm })
+    const [showAddExpense, setShowAddExpense] = useState(false)
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState('')
@@ -282,6 +283,7 @@ function TripExpenses({ tripId }) {
 
             await refreshExpenses()
             setForm({ ...emptyForm })
+            setShowAddExpense(false)
         } catch (err) {
             setError(err.message)
         } finally {
@@ -474,22 +476,51 @@ function TripExpenses({ tripId }) {
                     </div>
 
                     <div className="expense-add-panel">
-                        <h4>➕ Add New Expense</h4>
-                        <p>Record what you spent during your trip.</p>
+                        <button
+                            type="button"
+                            className="expense-open-modal-btn"
+                            onClick={() => setShowAddExpense(true)}
+                        >
+                            + Add Expense
+                        </button>
+                    </div>
 
-                        <form onSubmit={handleSubmit}>
+                    <ResponsiveFormDialog
+                        open={showAddExpense}
+                        title="Add New Expense"
+                        onClose={() => {
+                            if (saving) return
+
+                            if (
+                                window.confirm(
+                                    'Close this form? Any unsaved changes will be lost.'
+                                )
+                            ) {
+                                setShowAddExpense(false)
+                                setForm({ ...emptyForm })
+                                setError('')
+                            }
+                        }}
+                    >
+                        <form
+                            className="expense-modal-form"
+                            onSubmit={handleSubmit}
+                        >
+                            <p>Record what you spent during your trip.</p>
+
                             <ExpenseFields
                                 values={form}
                                 onChange={handleChange}
                                 prefix={`expense-${tripId}`}
                             />
-                            <button type="submit" disabled={saving}>
-                                {saving
-                                    ? 'Saving Expense...'
-                                    : '+ Add Expense'}
-                            </button>
+
+                            <div className="expense-actions">
+                                <button type="submit" disabled={saving}>
+                                    {saving ? 'Saving Expense...' : '+ Add Expense'}
+                                </button>
+                            </div>
                         </form>
-                    </div>
+                    </ResponsiveFormDialog>
 
                     <div className="expense-history-header">
                         <div>
@@ -562,6 +593,53 @@ function TripExpenses({ tripId }) {
                                         </strong>
                                     </div>
 
+                                    <ResponsiveFormDialog
+                                        open={Boolean(editingId)}
+                                        title="Edit Expense"
+                                        onClose={() => {
+                                            if (updating) return
+
+                                            if (
+                                                window.confirm(
+                                                    'Close this form? Any unsaved changes will be lost.'
+                                                )
+                                            ) {
+                                                cancelEditing()
+                                                setError('')
+                                            }
+                                        }}
+                                    >
+                                        {editingId && (
+                                            <form
+                                                className="expense-edit-form expense-modal-form"
+                                                onSubmit={handleUpdate}
+                                            >
+                                                <ExpenseFields
+                                                    values={editForm}
+                                                    onChange={handleEditChange}
+                                                    prefix={`edit-${editingId}`}
+                                                />
+
+                                                <div className="expense-actions">
+                                                    <button type="submit" disabled={updating}>
+                                                        {updating
+                                                            ? 'Saving Changes...'
+                                                            : 'Save Changes'}
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        className="expense-secondary-btn"
+                                                        onClick={cancelEditing}
+                                                        disabled={updating}
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        )}
+                                    </ResponsiveFormDialog>
+
                                     <p className="expense-item-date">
                                         📅 {formatDate(expense.expenseDate)}
                                     </p>
@@ -572,58 +650,26 @@ function TripExpenses({ tripId }) {
                                         </p>
                                     )}
 
-                                    {editingId === expense._id ? (
-                                        <form
-                                            className="expense-edit-form"
-                                            onSubmit={handleUpdate}
+                                    <div className="expense-actions">
+                                        <button
+                                            type="button"
+                                            className="expense-secondary-btn"
+                                            onClick={() => startEditing(expense)}
                                         >
-                                            <h5>Edit Expense</h5>
-                                            <ExpenseFields
-                                                values={editForm}
-                                                onChange={handleEditChange}
-                                                prefix={`edit-${expense._id}`}
-                                            />
+                                            ✏️ Edit
+                                        </button>
 
-                                            <div className="expense-actions">
-                                                <button
-                                                    type="submit"
-                                                    disabled={updating}
-                                                >
-                                                    {updating
-                                                        ? 'Saving Changes...'
-                                                        : 'Save Changes'}
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="expense-secondary-btn"
-                                                    onClick={cancelEditing}
-                                                    disabled={updating}
-                                                >
-                                                    Cancel
-                                                </button>
-                                            </div>
-                                        </form>
-                                    ) : (
-                                        <div className="expense-actions">
-                                            <button
-                                                type="button"
-                                                className="expense-secondary-btn"
-                                                onClick={() => startEditing(expense)}
-                                            >
-                                                ✏️ Edit
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="expense-danger-btn"
-                                                disabled={deletingId === expense._id}
-                                                onClick={() => handleDelete(expense._id)}
-                                            >
-                                                {deletingId === expense._id
-                                                    ? 'Deleting...'
-                                                    : '🗑️ Delete'}
-                                            </button>
-                                        </div>
-                                    )}
+                                        <button
+                                            type="button"
+                                            className="expense-danger-btn"
+                                            disabled={deletingId === expense._id}
+                                            onClick={() => handleDelete(expense._id)}
+                                        >
+                                            {deletingId === expense._id
+                                                ? 'Deleting...'
+                                                : '🗑️ Delete'}
+                                        </button>
+                                    </div>
                                 </article>
                             ))}
                         </div>
