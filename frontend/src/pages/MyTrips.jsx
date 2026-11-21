@@ -5,6 +5,7 @@ import EditTrip from './EditTrip'
 import JournalEntries from './JournalEntries'
 import TripExpenses from './TripExpenses'
 import TripTimeline from './TripTimeline'
+import ResponsiveFormDialog from '../components/ResponsiveFormDialog'
 
 function MyTrips() {
     const [trips, setTrips] = useState([])
@@ -18,6 +19,7 @@ function MyTrips() {
     const [selectedTimelineTripId, setSelectedTimelineTripId] = useState(null)
     const [search, setSearch] = useState('')
     const [filter, setFilter] = useState('all')
+    const [showCreateTrip, setShowCreateTrip] = useState(false)
 
     useEffect(() => {
         let active = true
@@ -58,6 +60,7 @@ function MyTrips() {
             newTrip,
             ...previousTrips,
         ])
+        setShowCreateTrip(false)
     }
 
     const handleTripUpdated = (updatedTrip) => {
@@ -205,8 +208,25 @@ function MyTrips() {
     return (
         <section className="mytrips">
             <div className="mytrips-create">
-                <CreateTrip onTripCreated={handleTripCreated} />
+                <button
+                    type="button"
+                    onClick={() => setShowCreateTrip(true)}
+                >
+                    + Create New Trip
+                </button>
             </div>
+
+            <ResponsiveFormDialog
+                open={showCreateTrip}
+                title="Create New Trip"
+                onClose={() => {
+                    if (window.confirm('Close this form? Any unsaved changes will be lost.')) {
+                        setShowCreateTrip(false)
+                    }
+                }}
+            >
+                <CreateTrip onTripCreated={handleTripCreated} />
+            </ResponsiveFormDialog>
 
             <div className="mytrips-heading">
                 <div>
@@ -226,16 +246,24 @@ function MyTrips() {
                 </p>
             )}
 
-            {editingTrip && (
-                <div className="mytrips-edit-panel">
+            <ResponsiveFormDialog
+                open={Boolean(editingTrip)}
+                title="Edit Trip"
+                onClose={() => {
+                    if (window.confirm('Close this form? Any unsaved changes will be lost.')) {
+                        setEditingTrip(null)
+                    }
+                }}
+            >
+                {editingTrip && (
                     <EditTrip
                         key={editingTrip._id}
                         trip={editingTrip}
                         onTripUpdated={handleTripUpdated}
                         onCancel={() => setEditingTrip(null)}
                     />
-                </div>
-            )}
+                )}
+            </ResponsiveFormDialog>
 
             {loading ? (
                 <p>Loading trips...</p>
