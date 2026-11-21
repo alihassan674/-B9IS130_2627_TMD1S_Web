@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import CreateJournalEntry from './CreateJournalEntry'
 import EditJournalEntry from './EditJournalEntry'
 import PhotoGallery from './PhotoGallery'
+import ResponsiveFormDialog from '../components/ResponsiveFormDialog'
 
 function JournalEntries({ tripId }) {
     const [entries, setEntries] = useState([])
@@ -11,6 +12,7 @@ function JournalEntries({ tripId }) {
     const [editingEntry, setEditingEntry] = useState(null)
     const [deletingId, setDeletingId] = useState(null)
     const [search, setSearch] = useState('')
+    const [showCreateJournal, setShowCreateJournal] = useState(false)
 
     const sortEntries = (items) =>
         [...items].sort(
@@ -72,6 +74,8 @@ function JournalEntries({ tripId }) {
         setEntries((previousEntries) =>
             sortEntries([...previousEntries, newEntry])
         )
+
+        setShowCreateJournal(false)
     }
 
     const handleEntryUpdated = (updatedEntry) => {
@@ -177,11 +181,33 @@ function JournalEntries({ tripId }) {
             </div>
 
             <div className="journal-create-panel">
+                <button
+                    type="button"
+                    className="journal-add-entry-btn"
+                    onClick={() => setShowCreateJournal(true)}
+                >
+                    + Add Journal Entry
+                </button>
+            </div>
+
+            <ResponsiveFormDialog
+                open={showCreateJournal}
+                title="Add Journal Entry"
+                onClose={() => {
+                    if (
+                        window.confirm(
+                            'Close this form? Any unsaved changes will be lost.'
+                        )
+                    ) {
+                        setShowCreateJournal(false)
+                    }
+                }}
+            >
                 <CreateJournalEntry
                     tripId={tripId}
                     onEntryCreated={handleEntryCreated}
                 />
-            </div>
+            </ResponsiveFormDialog>
 
             {error && (
                 <p className="journal-error" role="alert">
@@ -189,8 +215,20 @@ function JournalEntries({ tripId }) {
                 </p>
             )}
 
-            {editingEntry && (
-                <div className="journal-edit-panel">
+            <ResponsiveFormDialog
+                open={Boolean(editingEntry)}
+                title="Edit Journal Entry"
+                onClose={() => {
+                    if (
+                        window.confirm(
+                            'Close this form? Any unsaved changes will be lost.'
+                        )
+                    ) {
+                        setEditingEntry(null)
+                    }
+                }}
+            >
+                {editingEntry && (
                     <EditJournalEntry
                         key={editingEntry._id}
                         tripId={tripId}
@@ -198,8 +236,8 @@ function JournalEntries({ tripId }) {
                         onEntryUpdated={handleEntryUpdated}
                         onCancel={() => setEditingEntry(null)}
                     />
-                </div>
-            )}
+                )}
+            </ResponsiveFormDialog>
 
             <div className="journal-list-header">
                 <div>
@@ -236,8 +274,8 @@ function JournalEntries({ tripId }) {
                             <span>✍️</span>
                             <h4>No journal entries yet</h4>
                             <p>
-                                Start writing about your trip using
-                                the form above.
+                                Click Add Journal Entry to capture
+                                your first travel memory.
                             </p>
                         </div>
                     ) : filteredEntries.length === 0 ? (

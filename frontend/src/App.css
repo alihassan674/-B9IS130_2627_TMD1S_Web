@@ -4014,3 +4014,47 @@ button:active:not(:disabled) {
     padding: 14px 18px;
   }
 }
+
+/* Journal modal trigger button */
+
+.journal-create-panel {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 20px;
+}
+
+.journal-add-entry-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.journal-add-entry-btn:hover {
+  background: #1d4ed8;
+}
+
+/* Remove unnecessary form container spacing inside modal */
+
+.responsive-form-dialog-body .create-journal,
+.responsive-form-dialog-body .edit-journal {
+  margin: 0;
+  max-width: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+@media (max-width: 600px) {
+  .journal-create-panel {
+    justify-content: stretch;
+  }
+
+  .journal-add-entry-btn {
+    width: 100%;
+  }
+}
