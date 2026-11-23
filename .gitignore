@@ -38,7 +38,7 @@ All-Project-Data.docx
 evidence/
 
 # Environment variables and secrets
-.env
+
 .env.*
 !.env.example
 
